@@ -21,8 +21,8 @@
 #include "bar/bar.h"
 #include "testing/testing.h"
 
-void TestBar(Test* t) {
+void TestBar(void *t) {
 	int foo = 1;
 	int bar = bar_Bar(foo);
-	printf("%s: bar=%d t=%p\n", __func__, bar, (void *)t);
+	printf("%s: bar=%d t=%p\n", __func__, bar, t);
 }

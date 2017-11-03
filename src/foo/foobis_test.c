@@ -21,10 +21,10 @@
 #include "foo/foo.h"
 #include "testing/testing.h"
 
-void TestFoobis(Test* t) {
-	printf("%s: t=%p\n", __func__, (void *)t);
+void TestFoobis(void *t) {
+	printf("%s: t=%p\n", __func__, t);
 }
 
-void TestFoobis2(Test* t) {
-	printf("%s: %p\n", __func__, (void *)t);
+void TestFoobis2(void *t) {
+	printf("%s: %p\n", __func__, t);
 }

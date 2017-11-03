@@ -1,4 +1,4 @@
-#    Vade - Go Methodology for C/C++ using GNU Make
+#    Vade - Tool for managing C/C++ source code using GNU Make
 #    Copyright (C) 2017  Nicolas Sauzede <nsauzede@laposte.net>
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,7 @@
 # support using this Makefile from foreign location
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKE:=make -f $(mkfile_path)
+VADEROOT:=$(shell dirname $(mkfile_path))
 
 AR:=ar
 
@@ -27,7 +28,8 @@ LIBS=$(patsubst src/%,pkg/lib%.a,$(SRCS))
 
 TESTS=$(patsubst %,bin/%_test.exe,$(DIRS))
 #RUN_TESTS=$(patsubst %,bin/%_test.exe/RUN,$(DIRS))
-RUN_TESTS=$(patsubst %,%/RUN,$(wildcard bin/*_test.exe))
+#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*_test.exe))
+RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*.exe))
 
 _AT_=@
 _AT_1=
@@ -57,6 +59,9 @@ CXXFLAGS+=-fPIC
 CFLAGS+=-Isrc
 CXXFLAGS+=-Isrc
 
+CFLAGS+=-I$(VADEROOT)/src
+CXXFLAGS+=-I$(VADEROOT)/src
+
 .PHONY:all check clean clobber
 
 all: pkg bin $(PKGS)
@@ -76,16 +81,16 @@ pkg/$(STEM)/%.o: src/$(STEM)/%.cpp
 pkg/$(STEM)/%.d: src/$(STEM)/%.cpp
 	$(CXX) -MM -MP -o $@ $^ $(CXXFLAGS)
 
-pkg/$(STEM)/%.o: src/testing/%.c
+pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.c
 	$(CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
 
-pkg/$(STEM)/%.o: src/testing/%.cpp
+pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.cpp
 	$(CXX) -c -o $@ $^ $(CXXFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
 
 TESTOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard src/$(STEM)/*_test.c)))
 TESTOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/*_test.cpp)))
 
-TESTOBJ0=$(patsubst src/testing/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard src/testing/testing.c)))
+TESTOBJ0=$(patsubst $(VADEROOT)/src/testing/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard $(VADEROOT)/src/testing/testing.c)))
 
 TESTOBJS+=$(TESTOBJ0)
 
@@ -100,7 +105,8 @@ DEPS=$(patsubst %.h:,%.o,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM
 pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "LIBOBJS=$(LIBOBJS)"
-	$(call BRIEF,AR) cr $@ $^
+#	$(call BRIEF,AR) cr $@ $^
+	$(AR) cr $@ $^
 
 bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"

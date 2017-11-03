@@ -19,6 +19,27 @@
 #ifndef TESTING_H__
 #define TESTING_H__
 
-typedef int Test;
+/* In order to use lightwheight testing framework, for example to test the package 'foo/foo.c'
+you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' and 'testing/testing.h'
+
+testing/testing is provided in vade install tree
+
+The usage is simple :
+Create test APIs, like :
+void foo_TestFoo(void *opaque);
+
+where opaque is a testing private pointer, that must be passed to testing APIs.
+
+*/
+
+// testing APIs include :
+
+void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
+
+void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
+void testing_Fail(void *opaque);			// indicate a test failure
+// else test pass
+
+//typedef int Test;
 
 #endif/*TESTING_H__*/

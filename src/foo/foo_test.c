@@ -21,14 +21,14 @@
 #include "foo/foo.h"
 #include "testing/testing.h"
 
-void TestFoo(Test* t) {
+void TestFoo(void *t) {
 	int bar = 1;
 	int foo = foo_Foo(bar);
-	printf("%s: foo=%d t=%p\n", __func__, foo, (void *)t);
+	printf("%s: foo=%d t=%p\n", __func__, foo, t);
 }
 
-void TestFoo2(Test* t) {
+void TestFoo2(void *t) {
 	int bar = 2;
 	int foo = foo_Foo(bar);
-	printf("%s: foo=%d t=%p\n", __func__, foo, (void *)t);
+	printf("%s: foo=%d t=%p\n", __func__, foo, t);
 }

@@ -1,0 +1,110 @@
+#!/bin/sh
+
+#    Vade - Tool for managing C/C++ source code using GNU Make
+#    Copyright (C) 2017  Nicolas Sauzede <nsauzede@laposte.net>
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# If VADEPATH is not defined, use some default
+: ${VADEPATH:=${HOME}/vade}
+
+VADEBIN=$0
+VADECMD=$1
+
+VADEFULL=`readlink ${VADEBIN} || ${VADEBIN}`
+VADEROOT=`dirname ${VADEFULL}`
+
+VADE=vade
+
+#echo "VADEROOT=${VADEROOT}"
+#echo "VADEPATH=${VADEPATH}"
+#echo "VADECMD=${VADECMD}"
+
+SILENCEMAKE=-s
+
+if [ "x${VADECMD}" != "x" ]; then
+#	VADECMD="help"
+#else
+	shift
+	VADESUBCMD=$1
+	VADEARGS=$*
+fi
+
+#echo "VADESUBCMD=${VADESUBCMD}"
+#echo "VADEARGS=${VADEARGS}"
+
+VADEHELP="help"
+VADEBUILD="build"
+VADECLEAN="clean"
+VADETEST="test"
+case ${VADECMD} in
+"" | "help") :
+	case ${VADESUBCMD} in
+	"") :
+		echo "Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)"
+		echo ""
+		echo "Usage:"
+		echo ""
+		echo "\t${VADE} command [arguments]"
+		echo ""
+		echo "The commands are:"
+		echo ""
+		echo "\t${VADEBUILD}\tcompile packages and dependencies"
+		echo "\t${VADECLEAN}\tremove object files"
+		echo "\t${VADETEST}\ttest packages"
+		echo ""
+		if [ "x${VADECMD}" = "xhelp" ]; then
+			exit 0
+		else
+			exit 2
+		fi
+		;;
+	${VADEBUILD}) :
+		echo "Usage: ${VADE} ${VADESUBCMD} [-o output] [-i] [build flags] [packages]"
+		echo ""
+		exit 0
+		;;
+	${VADECLEAN}) :
+		echo "Usage: ${VADE} ${VADESUBCMD} [-i] [-r] [-n] [-x] [build flags] [packages]"
+		echo ""
+		exit 0
+		;;
+	${VADETEST}) :
+		echo "Usage: ${VADE} ${VADESUBCMD} [build/test flags] [packages] [build/test flags & test binary flags]"
+		echo ""
+		exit 0
+		;;
+	*) :
+		echo "Unknown help topic `${VADESUBCMD}`.  Run '${VADE} help'."
+		echo ""
+		exit 2
+		;;
+	esac
+	;;
+${VADEBUILD}) :
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS}
+	;;
+${VADECLEAN}) :
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS}
+	;;
+${VADETEST}) :
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS}
+	;;
+*) :
+	echo "${VADE}: unknown command \"${VADECMD}\""
+	echo "Run '${VADE} help' for usage."
+	echo ""
+	exit 2
+	;;
+esac

@@ -23,6 +23,7 @@
 
 #include "testing.h"
 
+typedef int Test;
 typedef void (*testfunction)(Test* t);
 
 static char testing_syms[] = ""
@@ -32,6 +33,10 @@ static char testing_syms[] = ""
 	TESTING_SYMS
 #endif
 ;
+
+void testing_Logf(void *opaque, const char *fmt, ...) {
+	printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
+}
 
 int main(int argc, char *argv[]) {
 	int arg = 1;
