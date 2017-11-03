@@ -31,7 +31,8 @@ VADE=vade
 #echo "VADEPATH=${VADEPATH}"
 #echo "VADECMD=${VADECMD}"
 
-SILENCEMAKE=-s
+#SILENCEMAKE=-s
+SILENCEMAKE=--no-print-directory
 
 if [ "x${VADECMD}" != "x" ]; then
 #	VADECMD="help"
@@ -92,6 +93,11 @@ case ${VADECMD} in
 		;;
 	esac
 	;;
+esac
+
+test -d ${VADEPATH} || (echo "can't load package: package .: no buildable source files in ${VADEPATH}" ; exit 1)
+
+case ${VADECMD} in
 ${VADEBUILD}) :
 	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS}
 	;;

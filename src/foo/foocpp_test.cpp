@@ -31,7 +31,7 @@ public:
 	}
 };
 
-void TestFooCPP(void *t) {
+void foo_TestFooCPP(void *t) {
 	A a2(2);
 	printf("%s: t=%p\n", __func__, t);
 	A a;

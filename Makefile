@@ -33,14 +33,19 @@ RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*.exe))
 
 _AT_=@
 _AT_1=
-AT2=$(AT)printf "\t$1\t%s\n" $2 &&
+#AT2=$(AT)printf "\t$1\t%s\n" $2 &&
+_AT2_=@printf "\t$1\t%s\n" $2 &&
+_AT2_1=
+AT2=$(_AT2_$(V))
 AT=$(_AT_$(V))
 
-_SILENTMAKE_=-s
+#_SILENTMAKE_=-s
+_SILENTMAKE_=--no-print-directory
 _SILENTMAKE_1=
 SILENTMAKE=$(_SILENTMAKE_$(V))
 
 BRIEF2=$(AT2) $($1)
+#BRIEF2=$(_AT2_$(V)) $($1)
 BRIEF=$(call BRIEF2,$1,`basename $@`)
 
 CFLAGS+=-g -O0
@@ -67,25 +72,26 @@ CXXFLAGS+=-I$(VADEROOT)/src
 all: pkg bin $(PKGS)
 
 pkg bin:
+#	echo "V=${V}"
 	$(AT)mkdir $@
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.c
-	$(CC) -c -o $@ $^ $(CFLAGS)
+	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS)
 
 pkg/$(STEM)/%.d: src/$(STEM)/%.c
-	$(CC) -MM -MP -o $@ $^ $(CFLAGS)
+	$(call BRIEF,CC) -MM -MP -o $@ $^ $(CFLAGS)
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.cpp
-	$(CXX) -c -o $@ $^ $(CXXFLAGS)
+	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS)
 
 pkg/$(STEM)/%.d: src/$(STEM)/%.cpp
-	$(CXX) -MM -MP -o $@ $^ $(CXXFLAGS)
+	$(call BRIEF,CXX) -MM -MP -o $@ $^ $(CXXFLAGS)
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.c
-	$(CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
+	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.cpp
-	$(CXX) -c -o $@ $^ $(CXXFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
+	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
 
 TESTOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard src/$(STEM)/*_test.c)))
 TESTOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/*_test.cpp)))
@@ -96,17 +102,17 @@ TESTOBJS+=$(TESTOBJ0)
 
 pkg/$(STEM)/lib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "lib%_test.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
-	$(AT)ar cr $@ $^
+	$(call BRIEF,AR) cr $@ $^
 
 LIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(STEM)/%_test.c,,$(wildcard src/$(STEM)/*.c))))
 LIBOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(STEM)/%_test.cpp,,$(wildcard src/$(STEM)/*.cpp))))
 
-DEPS=$(patsubst %.h:,%.o,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep '.h:'))
+DEPS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.h:,%.o,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep '.h:')))
 pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "LIBOBJS=$(LIBOBJS)"
 #	$(call BRIEF,AR) cr $@ $^
-	$(AR) cr $@ $^
+	$(call BRIEF,AR) cr $@ $^
 
 bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -123,13 +129,13 @@ bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
 
-TESTING_SYMS=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ Test | cut -f 3 -d ' ')
-TESTING_SYMS+=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ _Z10Test | cut -f 3 -d ' ')
+TESTING_SYMS=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
+TESTING_SYMS+=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ _Z10$(STEM)_Test | cut -f 3 -d ' ')
 bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
-#	$(CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
+#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
-#	$(CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
+#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 
 bin/%.exe: $(LIB) | $(LIB)
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive
