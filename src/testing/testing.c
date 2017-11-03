@@ -56,12 +56,14 @@ int main(int argc, char *argv[]) {
 			tokend = token + strlen(token);
 		}
 		const char *buf = token;
-		void *sym = dlsym(handle, buf);
-		if (sym) {
-			testfunction tf = (testfunction)sym;
-			tf(0);
-		} else {
-			printf("error: %s\n", dlerror());
+		if (buf[0]) {
+			void *sym = dlsym(handle, buf);
+			if (sym) {
+				testfunction tf = (testfunction)sym;
+				tf(0);
+			} else {
+				printf("error: %s\n", dlerror());
+			}
 		}
 		token = tokend;
 	}

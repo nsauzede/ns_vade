@@ -34,6 +34,9 @@ where opaque is a testing private pointer, that must be passed to testing APIs.
 
 // testing APIs include :
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
 
 void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
@@ -41,5 +44,8 @@ void testing_Fail(void *opaque);			// indicate a test failure
 // else test pass
 
 //typedef int Test;
+#ifdef __cplusplus
+}
+#endif
 
 #endif/*TESTING_H__*/

@@ -130,7 +130,7 @@ bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
 	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
 
 TESTING_SYMS=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
-TESTING_SYMS+=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ _Z10$(STEM)_Test | cut -f 3 -d ' ')
+TESTING_SYMS+=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
 bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
