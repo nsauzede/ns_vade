@@ -34,7 +34,7 @@ static char testing_syms[] = ""
 #endif
 ;
 
-void testing_Logf(void *opaque, const char *fmt, ...) {
+void testing_Logf(const void *opaque, const char *fmt, ...) {
 	printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
 }
 

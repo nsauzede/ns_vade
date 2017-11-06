@@ -25,7 +25,7 @@ you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' 
 testing/testing is provided in vade install tree
 
 The usage is simple :
-Create test APIs, like :
+Create test APIs with testing_function_t signature, like :
 void foo_TestFoo(void *opaque);
 
 where opaque is a testing private pointer, that must be passed to testing APIs.
@@ -37,13 +37,14 @@ where opaque is a testing private pointer, that must be passed to testing APIs.
 #ifdef __cplusplus
 extern "C" {
 #endif
-void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
 
-void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
-void testing_Fail(void *opaque);			// indicate a test failure
-// else test pass
+typedef void (*testing_function_t)(const void *opaque);
 
-//typedef int Test;
+void testing_Logf(const void *opaque, const char *fmt, ...);		// printf-like API to output error message format
+
+void testing_Errorf(const void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
+void testing_Fail(const void *opaque);			// indicate a test failure
+
 #ifdef __cplusplus
 }
 #endif
