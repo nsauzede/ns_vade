@@ -48,11 +48,30 @@ BRIEF2=$(AT2) $($1)
 #BRIEF2=$(_AT2_$(V)) $($1)
 BRIEF=$(call BRIEF2,$1,`basename $@`)
 
-CFLAGS+=-g -O0
-CXXFLAGS+=-g -O0
+#DEBUG?=-g
+ifdef $(DEBUG)
+CFLAGS+=$(DEBUG)
+CXXFLAGS+=$(DEBUG)
+endif
 
+OPT?=-O0
+ifdef OPT
+CFLAGS+=$(OPT)
+CXXFLAGS+=$(OPT)
+endif
+
+#CXXSTD?=11
+CXXSTD?=17
+
+CSTD?=c11
+
+ifdef CSTD
 CFLAGS+=-std=c11
-CXXFLAGS+=-std=c++11
+endif
+
+ifdef CXXSTD
+CXXFLAGS+=-std=c++$(CXXSTD)
+endif
 
 CFLAGS+=-Wall -Werror -Wextra
 #CFLAGS+=-pedantic
