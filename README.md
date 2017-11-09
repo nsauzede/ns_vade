@@ -1,7 +1,5 @@
 # Vade
 Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make and bash
-Licensed under GPLv3 (see LICENSE)
-Copyright (C) 2017  Nicolas Sauzede <nsauzede@laposte.net>
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
 Vade tries to bring its cool features (easy build, lightweight testing, ..) for C/C++ languages
@@ -14,10 +12,10 @@ The only caveat is if your packages depend on external libraries (eg: libz, whic
 For now these limitations are not addressed.
 
 To use it it's simple :
-1) clone vade repository to /some/path/vade
-2) add ". /some/path/vade/vade" to your ~/.bashrc (this will add 'vade' cmd to your path and autocompletion)
-3) create ~/vade as your workspace
-4) add your packages in ~/vade/src/<pkgs>
+1) clone vade repository somewhere (eg: ~/git/vade)
+2) add "[ -f ~/git/vade/vade ] && . ~/git/vade/vade" to your ~/.bashrc (this will both add 'vade' cmd to your path and setup autocompletion)
+3) create ~/vade as your workspace or directly use /some/path/vade as your workspace (your workspace can be overrided with VADEPATH)
+4) add your packages in ${VADEPATH}/src/<pkgs>
 
 Done.
 

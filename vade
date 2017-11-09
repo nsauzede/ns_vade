@@ -73,9 +73,6 @@ fi
 #echo "Script is a subshell CMD=$VADECMD"
 #exit 0
 
-# If VADEPATH is not defined, use some default
-: ${VADEPATH:=${HOME}/vade}
-
 VADEFULL=$(realpath `readlink ${VADEBIN} || echo ${VADEBIN}`)
 VADEROOT=`dirname ${VADEFULL}`
 #VADE=`basename ${VADEFULL}`
@@ -87,13 +84,20 @@ VADEBINPATH=${VADEROOT}
 #VADE="$vade"
 #VADEBINPATH="$vaderoot"
 
+# If VADEPATH is not defined, try some default..
+: ${VADEPATH:=${HOME}/vade}
+# Else fallback to vade root itself.
+if [ ! -d "${VADEPATH}" ]; then
+	VADEPATH=${VADEROOT}
+fi
+
 #echo "VADEBIN=${VADEBIN}"
 #echo "VADECMD=${VADECMD}"
-#echo "VADEPATH=${VADEPATH}"
 #echo "VADEFULL=${VADEFULL}"
 #echo "VADEROOT=${VADEROOT}"
 #echo "VADE=${VADE}"
 #echo "VADEBINPATH=${VADEBINPATH}"
+#echo "VADEPATH=${VADEPATH}"
 
 #SILENCEMAKE=-s
 SILENCEMAKE=--no-print-directory
