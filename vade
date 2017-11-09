@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 #    Vade - Tool for managing C/C++ source code using GNU Make
 #    Copyright (C) 2017  Nicolas Sauzede <nsauzede@laposte.net>
@@ -16,24 +16,92 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# If VADEPATH is not defined, use some default
-: ${VADEPATH:=${HOME}/vade}
+vadecalled=$_
+#echo "Testing if script is being sourced.."
+if [ $vadecalled != $0 ]; then
+#echo "Script is being sourced"
+#echo "\$BASH_SOURCE ${BASH_SOURCE[@]}"
+
+#echo "_=$vadecalled 0=$0"
+
+vadebin=${BASH_SOURCE}
+vadefull=$(realpath `readlink ${vadebin} || echo ${vadebin}`)
+vaderoot=`dirname ${vadefull}`
+#vade=`basename ${vadefull}`
+vade=vade
+vadebinpath=${vaderoot}
+
+# add vade program path to PATH
+#echo "Checking if ${vadebinpath} is in PATH.."
+if [ -d "${vadebinpath}" ] && [[ ":$PATH:" != *":${vadebinpath}:"* ]]; then
+#	echo "Adding ${vadebinpath} to PATH"
+	PATH="${PATH:+"$PATH:"}${vadebinpath}"
+fi
+
+# add vade autocompletion
+#echo "Setting up '${vade}' autocompletion"
+_vade()
+{
+	local cur opts
+	COMPREPLY=()
+	cur="${COMP_WORDS[COMP_CWORD]}"
+	opts=$(vade complete)
+	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+	return 0
+}
+complete -o nospace -F _vade ${vade}
+
+unset vadecalled vadebin vadefull vaderoot vade vadebinpath
+
+#echo "Fall through to the end of file !"
+else
+
+VADEHELP="help"
+VADEBUILD="build"
+VADECLEAN="clean"
+VADETEST="test"
+VADECMDS="$VADEHELP $VADECLEAN $VADEBUILD $VADETEST"
 
 VADEBIN=$0
 VADECMD=$1
 
-VADEFULL=`readlink ${VADEBIN} || ${VADEBIN}`
+if [ "x${VADECMD}" = "xcomplete" ]; then
+	echo "$VADECMDS"
+	exit 0
+fi
+
+#echo "Script is a subshell CMD=$VADECMD"
+#exit 0
+
+# If VADEPATH is not defined, use some default
+: ${VADEPATH:=${HOME}/vade}
+
+VADEFULL=$(realpath `readlink ${VADEBIN} || echo ${VADEBIN}`)
 VADEROOT=`dirname ${VADEFULL}`
-
+#VADE=`basename ${VADEFULL}`
 VADE=vade
+VADEBINPATH=${VADEROOT}
+#VADEBIN="$vadebin"
+#VADEFULL="$vadefull"
+#VADEROOT="$vaderoot"
+#VADE="$vade"
+#VADEBINPATH="$vaderoot"
 
-#echo "VADEROOT=${VADEROOT}"
-#echo "VADEPATH=${VADEPATH}"
+#echo "VADEBIN=${VADEBIN}"
 #echo "VADECMD=${VADECMD}"
+#echo "VADEPATH=${VADEPATH}"
+#echo "VADEFULL=${VADEFULL}"
+#echo "VADEROOT=${VADEROOT}"
+#echo "VADE=${VADE}"
+#echo "VADEBINPATH=${VADEBINPATH}"
 
 #SILENCEMAKE=-s
 SILENCEMAKE=--no-print-directory
 
+#if [ "x${VADECMD}" = "x${VADECOMPLETE}" ]; then
+#	echo "${VADECMDS}"
+#	exit 0
+#elif [ "x${VADECMD}" != "x" ]; then
 if [ "x${VADECMD}" != "x" ]; then
 #	VADECMD="help"
 #else
@@ -45,26 +113,22 @@ fi
 #echo "VADESUBCMD=${VADESUBCMD}"
 #echo "VADEARGS=${VADEARGS}"
 
-VADEHELP="help"
-VADEBUILD="build"
-VADECLEAN="clean"
-VADETEST="test"
 case ${VADECMD} in
-"" | "help") :
+"" | ${VADEHELP}) :
 	case ${VADESUBCMD} in
 	"") :
-		echo "Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)"
-		echo ""
-		echo "Usage:"
-		echo ""
-		echo "\t${VADE} command [arguments]"
-		echo ""
-		echo "The commands are:"
-		echo ""
-		echo "\t${VADEBUILD}\tcompile packages and dependencies"
-		echo "\t${VADECLEAN}\tremove object files"
-		echo "\t${VADETEST}\ttest packages"
-		echo ""
+		echo -e "Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)"
+		echo -e ""
+		echo -e "Usage:"
+		echo -e ""
+		echo -e "\t${VADE} command [arguments]"
+		echo -e ""
+		echo -e "The commands are:"
+		echo -e ""
+		echo -e "\t${VADEBUILD}\tcompile packages and dependencies"
+		echo -e "\t${VADECLEAN}\tremove object files"
+		echo -e "\t${VADETEST}\ttest packages"
+		echo -e ""
 		if [ "x${VADECMD}" = "xhelp" ]; then
 			exit 0
 		else
@@ -114,3 +178,6 @@ ${VADETEST}) :
 	exit 2
 	;;
 esac
+
+fi
+#echo "The end, good bye!"
