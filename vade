@@ -84,9 +84,10 @@ VADEBINPATH=${VADEROOT}
 #VADE="$vade"
 #VADEBINPATH="$vaderoot"
 
-# If VADEPATH is not defined, try some default..
-: ${VADEPATH:=${HOME}/vade}
-# Else fallback to vade root itself.
+# If VADEPATH is not defined, try to autodetect..
+# 1) try current git root, 2) try ${HOME}/vade
+: ${VADEPATH:=`git rev-parse --show-toplevel 2> /dev/null || echo ${HOME}/vade`}
+# Else 3) fallback to vade root itself.
 if [ ! -d "${VADEPATH}" ]; then
 	VADEPATH=${VADEROOT}
 fi
