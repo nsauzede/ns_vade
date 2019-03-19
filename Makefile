@@ -54,7 +54,7 @@ CFLAGS+=$(DEBUG)
 CXXFLAGS+=$(DEBUG)
 endif
 
-OPT?=-O0
+#OPT?=-O2
 ifdef OPT
 CFLAGS+=$(OPT)
 CXXFLAGS+=$(OPT)
