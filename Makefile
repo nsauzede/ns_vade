@@ -73,9 +73,12 @@ ifdef CXXSTD
 CXXFLAGS+=-std=c++$(CXXSTD)
 endif
 
-CFLAGS+=-Wall -Werror -Wextra
-#CFLAGS+=-pedantic
-CXXFLAGS+=-Wall -Werror -Wextra -pedantic
+VADE_CFLAGS+=-Wall -Wextra
+#VADE_CFLAGS+=-pedantic
+VADE_CFLAGS+=-Werror
+VADE_CXXFLAGS+=-Wall -Wextra
+VADE_CXXFLAGS+=-pedantic
+VADE_CXXFLAGS+=-Werror
 
 CFLAGS+=-fPIC
 CXXFLAGS+=-fPIC
@@ -107,10 +110,10 @@ pkg/$(STEM)/%.d: src/$(STEM)/%.cpp
 	$(call BRIEF,CXX) -MM -MP -o $@ $^ $(CXXFLAGS)
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.c
-	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
+	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\"" $(VADE_CFLAGS)
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.cpp
-	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\""
+	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\"" $(VADE_CXXFLAGS)
 
 TESTOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard src/$(STEM)/*_test.c)))
 TESTOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/*_test.cpp)))

@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <dlfcn.h>
+#include <stdarg.h>
 
 #include "testing.h"
 
@@ -35,7 +36,13 @@ static char testing_syms[] = ""
 ;
 
 void testing_Logf(const void *opaque, const char *fmt, ...) {
-	printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
+	if (opaque) {
+		printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
+	}
+	va_list ap;
+	va_start(ap, fmt);
+	vprintf(fmt, ap);
+	va_end(ap);
 }
 
 int main(int argc, char *argv[]) {

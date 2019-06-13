@@ -16,10 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "bazcpp.h"
 
-A::A() {
-	printf("hello C++ baz\n");
+#include "testing/testing.h"
+
+void bazcpp_TestBazCPP(void *t) {
+	testing_Logf(t, "Testing bazcpp..\n");
+	A a;
 }
