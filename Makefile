@@ -18,6 +18,7 @@
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKE:=make -f $(mkfile_path)
 VADEROOT:=$(shell dirname $(mkfile_path))
+VADEMAKEINTERNAL:=make -f $(VADEROOT)/Makefile_internal SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
 AR:=ar
 
@@ -40,7 +41,7 @@ AT2=$(_AT2_$(V))
 AT=$(_AT_$(V))
 
 #_SILENTMAKE_=-s
-_SILENTMAKE_=--no-print-directory
+_SILENTMAKE_=--no-print-directory -s
 _SILENTMAKE_1=
 SILENTMAKE=$(_SILENTMAKE_$(V))
 
@@ -98,16 +99,16 @@ pkg bin:
 	$(AT)mkdir $@
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.c
-	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS)
+	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
 
 pkg/$(STEM)/%.d: src/$(STEM)/%.c
-	$(call BRIEF,CC) -MM -MP -o $@ $^ $(CFLAGS)
+	$(call BRIEF,CC) -MM -MT '$(@:.d=.o)' $^ $(CFLAGS) > $@
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.cpp
-	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS)
+	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
 
 pkg/$(STEM)/%.d: src/$(STEM)/%.cpp
-	$(call BRIEF,CXX) -MM -MP -o $@ $^ $(CXXFLAGS)
+	$(call BRIEF,CXX) -MM -MT '$(@:.d=.o)' $^ $(CXXFLAGS) > $@
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.c
 	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\"" $(VADE_CFLAGS)
@@ -162,14 +163,17 @@ bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 bin/%.exe: $(LIB) | $(LIB)
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
+.PHONY:$(PKGS)
+
 $(PKGS):
 #	$(AT)echo "pkg/%: how to build $@ ? stem=$* F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT0)test -d $(@) || echo "MKDIR $@" && mkdir -p $(@)
 	$(AT)test -d $(@) || mkdir -p $(@)
 	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
-	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
-	$(AT)test -f src/$(@F)/$(@F).h || $(MAKE) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V)
-	$(AT)test -z "$(wildcard src/$(@F)/*_test.*)" || $(MAKE) $(SILENTMAKE) bin/$(@F)_test.exe STEM=$(@F) V=$(V)
+#	$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
+	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
+	$(AT)test -f src/$(@F)/$(@F).h || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V)
+	$(AT)test -z "$(wildcard src/$(@F)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F)_test.exe STEM=$(@F) V=$(V)
 
 .PHONY:$(RUN_TESTS)
 

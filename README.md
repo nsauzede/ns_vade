@@ -1,5 +1,5 @@
 # Vade
-Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make and bash
+Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, GCC and bash
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
 Vade tries to bring its cool features (easy build, lightweight testing, ..) for C/C++ languages
@@ -24,7 +24,10 @@ $ vade clean
 $ vade build
 $ vade test
 
-Additional parameters after the first command (eg: build) are passed to Makefile (eg: CXXSTD=c++11)
+Note that vade build and vade test now support smart incremental (re)builds.
+(ie: gcc dependency files are automatically generated and use, so changes to impl or header files trigger recompilation)
+
+Additional parameters after the first command (eg: build) are passed to Makefile (eg: CXXSTD=c++11, V=1, etc..)
 
 Autocompletion :
 $ vade <tab><tab>

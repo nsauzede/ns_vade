@@ -1,0 +1,2 @@
+include $(VADEROOT)/Makefile
+include pkg/$(STEM)/$(STEM).d
