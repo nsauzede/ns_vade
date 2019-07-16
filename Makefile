@@ -95,20 +95,24 @@ CXXFLAGS+=-I$(VADEROOT)/src
 all: pkg bin $(PKGS)
 
 pkg bin:
-#	echo "V=${V}"
 	$(AT)mkdir $@
+
+DEPSCFILES=$(patsubst src/$(STEM)/%.c,$(STEM)/%,$(wildcard src/$(STEM)/*.c))
+DEPSCPPFILES=$(patsubst src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard src/$(STEM)/*.cpp))
+pkg/$(STEM)/%.d:
+	echo -n > $@
+	for cf in $(DEPSCFILES); do \
+		$(CC) -MM -MT "pkg/$$cf.o" src/$$cf.c $(CFLAGS) >> $@; \
+	done
+	for cf in $(DEPSCPPFILES); do \
+		$(CXX) -MM -MT "pkg/$$cf.o" src/$$cf.cpp $(CXXFLAGS) >> $@; \
+	done
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.c
 	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
 
-pkg/$(STEM)/%.d: src/$(STEM)/%.c
-	$(call BRIEF,CC) -MM -MT '$(@:.d=.o)' $^ $(CFLAGS) > $@
-
 pkg/$(STEM)/%.o: src/$(STEM)/%.cpp
 	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
-
-pkg/$(STEM)/%.d: src/$(STEM)/%.cpp
-	$(call BRIEF,CXX) -MM -MT '$(@:.d=.o)' $^ $(CXXFLAGS) > $@
 
 pkg/$(STEM)/%.o: $(VADEROOT)/src/testing/%.c
 	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTESTING_SYMS="\"$(TESTING_SYMS)\"" $(VADE_CFLAGS)
@@ -130,11 +134,12 @@ pkg/$(STEM)/lib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 LIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(STEM)/%_test.c,,$(wildcard src/$(STEM)/*.c))))
 LIBOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(STEM)/%_test.cpp,,$(wildcard src/$(STEM)/*.cpp))))
 
-DEPS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.h:,%.o,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep '.h:')))
+DEPS=$(patsubst %.h,%.o,$(patsubst src/%,pkg/%,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "testing" | grep '.h' | cut -f 3 -d " ")))
 pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
+#pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "LIBOBJS=$(LIBOBJS)"
-#	$(call BRIEF,AR) cr $@ $^
+#	$(AT)echo "DEPS=$(DEPS)"
 	$(call BRIEF,AR) cr $@ $^
 
 bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
