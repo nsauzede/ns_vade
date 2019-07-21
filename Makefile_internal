@@ -1,3 +1,2 @@
 include $(VADEROOT)/Makefile
-#include pkg/$(STEM)/$(STEM).d
-include pkg/dep.d
+include pkg/vade_dep.d

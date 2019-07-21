@@ -103,17 +103,16 @@ pkg bin:
 DEPSCFILES=$(patsubst src/$(STEM)/%.c,$(STEM)/%,$(wildcard src/$(STEM)/*.c))
 DEPSCPPFILES=$(patsubst src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard src/$(STEM)/*.cpp))
 pkg/$(STEM)/%.d:
-#	echo "DEPSCFILES=$(DEPSCFILES)"
-#	echo "DEPSCPPFILES=$(DEPSCPPFILES)"
-	echo -n > $@
-	for cf in $(DEPSCFILES); do \
+#	$(AT)echo "DEPSCFILES=$(DEPSCFILES)"
+#	$(AT)echo "DEPSCPPFILES=$(DEPSCPPFILES)"
+	$(AT)echo -n > $@
+	$(AT)for cf in $(DEPSCFILES); do \
 		$(CC) -MM -MT "pkg/$$cf.o" src/$$cf.c $(CFLAGS) -DTESTING_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
 	done
-	for cf in $(DEPSCPPFILES); do \
+	$(AT)for cf in $(DEPSCPPFILES); do \
 		$(CXX) -MM -MT "pkg/$$cf.o" src/$$cf.cpp $(CXXFLAGS) -DTESTING_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
 	done
-	cat $@ >> pkg/dep.d
-#	@echo "pkg/testing/testing.o: $(VADEROOT)/src/testing/testing.c $(VADEROOT)/src/testing/testing.h" >> pkg/dep.d
+	$(AT)cat $@ >> pkg/vade_dep.d
 
 pkg/$(STEM)/%.o: src/$(STEM)/%.c
 	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
@@ -204,7 +203,18 @@ bin/%.exe: $(LIB) | $(LIB)
 
 .PHONY:$(PKGS)
 
-$(PKGS):
+pkg/vade_dep.d:
+#	@echo "SRCS=$(SRCS)"
+#	@echo "DIRS=$(DIRS)"
+#	@echo "PKGS=$(PKGS)"
+#	@echo "LIBS=$(LIBS)"
+#	@echo "TESTS=$(TESTS)"
+	$(AT)for d in $(DIRS); do \
+		test -d pkg/$$d || mkdir -p pkg/$$d; \
+		$(MAKE) $(SILENTMAKE) pkg/$$d/$$d.d STEM=$$d V=$(V); \
+	done
+
+$(PKGS): pkg/vade_dep.d
 #	@echo "SRCS=$(SRCS)"
 #	@echo "DIRS=$(DIRS)"
 #	@echo "PKGS=$(PKGS)"
@@ -213,9 +223,9 @@ $(PKGS):
 #	@echo "tgt=$@"
 #	$(AT)echo "pkg/%: how to build $@ ? stem=$* F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT0)test -d $(@) || echo "MKDIR $@" && mkdir -p $(@)
-	$(AT)test -d $(@) || mkdir -p $(@)
-	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
-#	$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
+#	$(AT)test -d $(@) || mkdir -p $(@)
+#	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
+#	$(MAKE) $(SILENTMAKE) pkg/$(@F).d STEM=$(@F) V=$(V)
 	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
 	$(AT)test -f src/$(@F)/$(@F).h || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V)
 	$(AT)test -z "$(wildcard src/$(@F)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F)_test.exe STEM=$(@F) V=$(V)
