@@ -94,6 +94,8 @@ CXXFLAGS+=-I$(VADEROOT)/src
 .PHONY:all check clean clobber
 
 all: pkg bin $(PKGS)
+build: all
+test: check
 
 pkg bin:
 	$(AT)mkdir $@
