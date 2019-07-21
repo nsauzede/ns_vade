@@ -26,62 +26,48 @@ def dep(line):
                 pass
 #        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
 #        print("deps=%s" % deps)
+#        print("pkg/%s/%s.a: pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
         print("pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
-#                print("dep=%s" % dep)
                 dls = dep.split("/")
                 ddir = dls[-3]
                 dpkg = dls[-2]
                 dfil = dls[-1]
                 pfx = dfil.split('.')[0]
-#                print("dir=%s pkg=%s file=%s" % (dir, pkg, fil))
-#                        print(" NOTHDR",end="")
+                if dpkg != pkg:
+                        continue
                 if not tgt.endswith("_test"):
-                        if not isheader(dfil):
-                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
+                        if isheader(dfil):
+                                if os.path.isfile("src/%s/%s.c" % (dpkg, pfx)) or \
+                                        os.path.isfile("src/%s/%s.cpp" % (dpkg, pfx)):
+                                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
                 else:
                         if not isheader(dfil):
                                 print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
-#                        else:
-#                if isheader(dfil):
-#                        if dpkg==pfx:
-#                                print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
-#                       print(" EXTHDR",end="")
         print()
-        testing=None
         print("pkg/%s/lib%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
-#                print("dep=%s" % dep)
                 dls = dep.split("/")
                 ddir = dls[-3]
                 dpkg = dls[-2]
                 dfil = dls[-1]
                 pfx = dfil.split('.')[0]
-#                print("dir=%s pkg=%s file=%s" % (dir, pkg, fil))
-#                        print(" NOTHDR",end="")
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
                                 if dpkg!=pkg:
                                         print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
                         else:
-                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
+                                print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
                         if isheader(dfil):
                                 if dep.endswith("src/testing/testing.h"):
                                         print(" pkg/%s/testing.o" % pkg)
                                 else:
-                                        if dpkg==pkg:
+                                        if dpkg==pfx:
                                                 print(" pkg/%s/lib%s.a" % (dpkg, dpkg), end="")
                         else:
-                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
-#                        else:
-#                if isheader(dfil):
-#                        if dpkg==pfx:
-#                                print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
-#                       print(" EXTHDR",end="")
+                                print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
         print()
-#        if testing:
-#                print("pkg/testing/testing.o: %s" % "$(VADEROOT)/src/testing/testing.c")
 
 line = ""
 for l in sys.stdin:

@@ -136,9 +136,17 @@ pkg/testing/libtesting.a:
 #	$(AT)echo "Skipping special libtesting.a"
 	true
 
+pkg/testing/testing.a:
+#	$(AT)echo "Skipping special testing.a"
+	true
+
 pkg/testing/testing.o:
 #	$(AT)echo "Skipping special testing.o"
 	true
+
+lib%.a: %.a
+#	@echo "AUTO LIB tgt=$@ deps=$^"
+	$(call BRIEF,AR) crsT $@ $^
 
 lib%.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^"
