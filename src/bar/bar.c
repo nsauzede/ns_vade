@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "foo/foo.h"
+#include "bar/bar.h"
 
 int bar_Bar(int foo) {
 	int bar = foo_Foo(foo);

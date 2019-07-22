@@ -66,7 +66,7 @@ def dep(line):
                                         print(" pkg/%s/testing.o" % pkg)
                                 else:
                                         if dpkg==pfx:
-                                                print(" pkg/%s/lib%s.a" % (dpkg, dpkg), end="")
+                                                print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
                         else:
                                 print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
         if len(ddeps)>0:

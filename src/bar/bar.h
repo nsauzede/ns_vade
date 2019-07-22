@@ -19,6 +19,8 @@
 #ifndef BAR_H__
 #define BAR_H__
 
+#include "foo/foo.h"
+
 int bar_Bar(int foo);
 
 #endif/*BAR_H__*/
