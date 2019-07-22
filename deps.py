@@ -45,6 +45,7 @@ def dep(line):
                         if not isheader(dfil):
                                 print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
         print()
+        ddeps=[]
         print("pkg/%s/lib%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 dls = dep.split("/")
@@ -56,6 +57,7 @@ def dep(line):
                         if isheader(dfil):
                                 if dpkg!=pkg:
                                         print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
+                                        ddeps += [dpkg]
                         else:
                                 print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
@@ -67,7 +69,20 @@ def dep(line):
                                                 print(" pkg/%s/lib%s.a" % (dpkg, dpkg), end="")
                         else:
                                 print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
+        if len(ddeps)>0:
+                print(" |", end="")
+                for ddep in ddeps:
+#                        print(" pkg/%s" % ddep, end="")
+#                        print(" pkg/%s/lib%s.a" % (ddep, ddep), end="")
+                        print(" pkg/%s/%s.o" % (ddep, ddep), end="")
+#                print()
         print()
+        return
+        if len(ddeps)>0:
+                print("pkg/%s:" % pkg, end="")
+                for ddep in ddeps:
+                        print(" pkg/%s" % ddep, end="")
+                print()
 
 line = ""
 for l in sys.stdin:

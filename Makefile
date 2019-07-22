@@ -153,8 +153,14 @@ lib%.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^"
 	$(call BRIEF,AR) crsT $@ $^
 
+%_test.a: %_test.o
+#	@echo "AUTO LIB tgt=$@ deps=$^"
+	$(call BRIEF,AR) crsT $@ $^
+
+PROJ=$(patsubst %.a,%,$(@F))
 %.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^"
+	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
 	$(call BRIEF,AR) crsT $@ $^
 
 pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
@@ -211,7 +217,7 @@ pkg/vade_dep.d:
 #	@echo "TESTS=$(TESTS)"
 	$(AT)for d in $(DIRS); do \
 		test -d pkg/$$d || mkdir -p pkg/$$d; \
-		$(MAKE) $(SILENTMAKE) pkg/$$d/$$d.d STEM=$$d V=$(V); \
+		$(MAKE) $(SILENTMAKE) pkg/$$d/$$d.d STEM=$$d V=$(V) || exit 1; \
 	done
 
 $(PKGS): pkg/vade_dep.d
