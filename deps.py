@@ -17,17 +17,21 @@ def isheader(fil):
 def dep(line):
         print("%s" % line)
         ls=line.split(".o: ")
-#        print("gls=%s" % gls)
+#        print("ls=%s" % ls)
         rule=ls[0].split("/")
+        if len(rule) < 3:
+                return
         pkg=rule[1]
         tgt=rule[2]
+        if len(ls) < 2:
+                return
         deps=ls[1]
         if pkg != tgt:
                 pass
 #        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
 #        print("deps=%s" % deps)
-#        print("pkg/%s/%s.a: pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
-        print("pkg/%s/%s.a:" % (pkg, tgt), end="")
+        print("pkg/%s/%s.a: pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
+#        print("pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 dls = dep.split("/")
                 ddir = dls[-3]

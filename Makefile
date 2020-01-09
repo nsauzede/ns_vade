@@ -154,14 +154,17 @@ lib%.a: %.o
 	$(call BRIEF,AR) crsT $@ $^
 
 %_test.a: %_test.o
-#	@echo "AUTO LIB tgt=$@ deps=$^"
+#	@echo "AUTO test LIB tgt=$@ deps=$^"
 	$(call BRIEF,AR) crsT $@ $^
 
 PROJ=$(patsubst %.a,%,$(@F))
+ALIBOBJS=$(patsubst src/$(PROJ)/%.o,pkg/$(PROJ)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(PROJ)/%_test.c,,$(wildcard src/$(PROJ)/*.c))))
+ALIBOBJS+=$(patsubst src/$(PROJ)/%.o,pkg/$(PROJ)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(PROJ)/%_test.cpp,,$(wildcard src/$(PROJ)/*.cpp))))
 %.a: %.o
-#	@echo "AUTO LIB tgt=$@ deps=$^"
+#	@echo "AUTO LIB tgt=$@ deps=$^ PROJ=$(PROJ)"
 	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
 	$(call BRIEF,AR) crsT $@ $^
+#	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).a STEM=$(PROJ) V=$(V)
 
 pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "lib%_test.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -170,15 +173,37 @@ pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 LIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(STEM)/%_test.c,,$(wildcard src/$(STEM)/*.c))))
 LIBOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(STEM)/%_test.cpp,,$(wildcard src/$(STEM)/*.cpp))))
 
+pkg/$(STEM)/lib%_test.a: pkg/$(STEM)/%_test.a
+#	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+#	$(AT)echo "3LIBOBJS=$(LIBOBJS)"
+#	$(AT)echo "_DEPS=$(_DEPS)"
+#	$(AT)echo "DEPS=$(DEPS)"
+	$(call BRIEF,AR) crsT $@ $^
+
+pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
+#	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+#	$(AT)echo "2LIBOBJS=$(2LIBOBJS)"
+#	$(AT)echo "_DEPS=$(_DEPS)"
+#	$(AT)echo "DEPS=$(DEPS)"
+	$(call BRIEF,AR) crsT $@ $^
+
+pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
+#	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+#	$(AT)echo "0LIBOBJS=$(LIBOBJS)"
+#	$(AT)echo "_DEPS=$(_DEPS)"
+#	$(AT)echo "DEPS=$(DEPS)"
+	$(call BRIEF,AR) crsT $@ $^
+
 DEPS=$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | $(VADEROOT)/deps.py)
 #DEPS=$(patsubst %.h,%.o,$(patsubst src/%,pkg/%,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "testing" | grep '.h' | cut -f 3 -d " ")))
 #pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
-pkg/$(STEM)/Zlib%.a: $(LIBOBJS) | $(LIBOBJS)
+#pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
+pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
-#	$(AT)echo "LIBOBJS=$(LIBOBJS)"
+#	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
-	$(call BRIEF,AR) cr $@ $^
+	$(call BRIEF,AR) crsT $@ $^
 
 bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
