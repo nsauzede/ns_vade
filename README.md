@@ -11,13 +11,22 @@ It's suitable for simple (yet potentially  interdependent) packages.
 The only caveat is if your packages depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz)
 For now these limitations are not addressed.
 
-To use it it's simple :
-1) clone vade repository somewhere (eg: ~/git/vade)
-2) add "[ -f ~/git/vade/vade ] && . ~/git/vade/vade" to your ~/.bashrc (this will both add 'vade' cmd to your path and setup autocompletion)
-3) create ~/vade as your workspace or directly use /some/path/vade as your workspace (your workspace can be overrided with VADEPATH)
-4) add your packages in ${VADEPATH}/src/<pkgs>
+How to install vade for use:
+1) Clone vade repository somewhere (eg: ~/git/vade)
+2) Add "[ -f ~/git/vade/vade ] && . ~/git/vade/vade" to your ~/.bashrc
 
-Done.
+(ofc, replace `~/git/vade` to wherever you cloned vade)
+
+This will both add 'vade' cmd to your path and setup autocompletion.
+
+From now on you can start using vade in your project, which should be organised like this:
+```
+<project root>/src/<pkg1>/*.{h,c,cpp}
+                  /<pkg2>/*.{h,c,cpp}
+                  /...
+```
+By default it will locate your project's root based on the .git/ location if it's a git repo.
+Otherwise, you can use VADEPATH env var similar to GOPATH.
 
 You can now issue :
 $ vade clean build test
@@ -28,9 +37,14 @@ Note that vade build and vade test now support smart incremental (re)builds.
 Additional parameters after the last command (eg: build) are passed to Makefile (eg: CXXSTD=c++11, V=1, etc..)
 
 Autocompletion :
+```
 $ vade <tab><tab>
-
+```
+```
 $ vade help
+```
+```
 ...
+```
 
 Enjoy !
