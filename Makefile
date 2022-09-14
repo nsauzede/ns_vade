@@ -21,6 +21,7 @@ VADEROOT:=$(shell dirname $(mkfile_path))
 VADEMAKEINTERNAL:=make -f $(VADEROOT)/Makefile_internal SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
 AR:=ar
+NM:=nm
 
 #SRCS=$(patsubst src/testing,,$(wildcard src/*))
 SRCS=$(wildcard src/*)
@@ -50,16 +51,13 @@ BRIEF2=$(AT2) $($1)
 #BRIEF2=$(_AT2_$(V)) $($1)
 BRIEF=$(call BRIEF2,$1,`basename $@`)
 
-#DEBUG?=-g
-ifdef $(DEBUG)
-CFLAGS+=$(DEBUG)
-CXXFLAGS+=$(DEBUG)
-endif
-
 #OPT?=-O2
 ifdef OPT
 CFLAGS+=$(OPT)
 CXXFLAGS+=$(OPT)
+else
+CFLAGS+=-g -O0
+CXXFLAGS+=-g -O0
 endif
 
 CXXSTD?=11
@@ -76,10 +74,8 @@ CXXFLAGS+=-std=c++$(CXXSTD)
 endif
 
 VADE_CFLAGS+=-Wall -Wextra
-#VADE_CFLAGS+=-pedantic
 VADE_CFLAGS+=-Werror
 VADE_CXXFLAGS+=-Wall -Wextra
-VADE_CXXFLAGS+=-pedantic
 VADE_CXXFLAGS+=-Werror
 
 CFLAGS+=-fPIC
@@ -220,8 +216,8 @@ bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
 
-TESTING_SYMS=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
-TESTING_SYMS+=$(shell nm pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
+TESTING_SYMS=$(shell $(NM) pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
+TESTING_SYMS+=$(shell $(NM) pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
 #bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -258,7 +254,7 @@ $(PKGS): pkg/vade_dep.d
 #	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
 #	$(MAKE) $(SILENTMAKE) pkg/$(@F).d STEM=$(@F) V=$(V)
 	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
-	$(AT)test -f src/$(@F)/$(@F).h || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V)
+	$(AT)test -f pkg/$(@F)/lib$(@F).a && $(NM) pkg/$(@F)/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V) || true
 	$(AT)test -z "$(wildcard src/$(@F)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F)_test.exe STEM=$(@F) V=$(V)
 
 .PHONY:$(RUN_TESTS)
