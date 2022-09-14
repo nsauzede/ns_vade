@@ -56,6 +56,8 @@ unset vadecalled vadebin vadefull vaderoot vade vadebinpath
 #echo "Fall through to the end of file !"
 else
 
+VADE_VERSION="0.1"
+VADEVERSION="version"
 VADEHELP="help"
 VADEBUILD="build"
 VADECLEAN="clean"
@@ -119,6 +121,10 @@ fi
 #echo "VADEARGS=${VADEARGS}"
 
 case ${VADECMD} in
+${VADEVERSION}) :
+	echo "Vade version ${VADE_VERSION}"
+	exit 0
+	;;
 "" | ${VADEHELP}) :
 	case ${VADESUBCMD} in
 	"") :
@@ -130,9 +136,11 @@ case ${VADECMD} in
 		echo -e ""
 		echo -e "The commands are:"
 		echo -e ""
-		echo -e "\t${VADEBUILD}\tcompile packages and dependencies"
-		echo -e "\t${VADECLEAN}\tremove object files"
-		echo -e "\t${VADETEST}\ttest packages"
+		echo -e "\t${VADEHELP} [cmd]\tshow help (or cmd help)"
+		echo -e "\t${VADEVERSION}\t\tshow vade version"
+		echo -e "\t${VADEBUILD}\t\tcompile packages and dependencies"
+		echo -e "\t${VADECLEAN}\t\tremove object files"
+		echo -e "\t${VADETEST}\t\ttest packages"
 		echo -e ""
 		if [ "x${VADECMD}" = "xhelp" ]; then
 			exit 0
