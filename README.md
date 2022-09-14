@@ -11,6 +11,7 @@ It's suitable for simple (yet potentially  interdependent) packages.
 The only caveat is if your packages depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz)
 For now these limitations are not addressed.
 
+## Install
 How to install vade for use:
 1) Clone vade repository somewhere (eg: ~/git/vade)
 2) Add "[ -f ~/git/vade/vade ] && . ~/git/vade/vade" to your ~/.bashrc
@@ -28,6 +29,7 @@ From now on you can start using vade in your project, which should be organised 
 By default it will locate your project's root based on the .git/ location if it's a git repo.
 Otherwise, you can use VADEPATH env var similar to GOPATH.
 
+## Use
 You can now issue :
 $ vade clean build test
 
@@ -45,6 +47,29 @@ $ vade help
 ```
 ```
 ...
+```
+
+## Writing unit tests
+Unit tests can be written in a given package, by creating `src/<pkg>/*_test.{c,cpp}` files.
+Each such test file can contain several test functions, which should be named like this: `void <pkg>_Test*(void *);`.
+The `void *` argument is an opaque pointer to be provided to the provided `testing` package (see vade sources).
+
+Here is the simplest way to create a minimalist test/vade project:
+```
+$ mkdir myproj
+$ cd myproj
+$ git init
+$ mkdir -p src/a
+$ echo -e '#include <stdio.h>\nvoid a_Test(void *) { printf("Hello vade!\\n"); }' > src/a/a_test.c
+$ vade clean test
+    AR  liba.a
+    CC  a_test.o
+    CC  testing.o
+    AR  a_test.a
+    AR  liba_test.a
+    CXX a_test.exe
+    RUN ./bin/a_test.exe
+Hello vade!
 ```
 
 Enjoy !
