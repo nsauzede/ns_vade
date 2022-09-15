@@ -176,13 +176,13 @@ test -d ${VADEPATH} || (echo "can't load package: package .: no buildable source
 
 case ${VADECMD} in
 ${VADEBUILD}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS}
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
 	;;
 ${VADECLEAN}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS}
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
 	;;
 ${VADETEST}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS}
+	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
 	;;
 *) :
 	echo "${VADE}: unknown command \"${VADECMD}\""

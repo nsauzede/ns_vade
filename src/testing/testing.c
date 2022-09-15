@@ -42,6 +42,8 @@ static char testing_syms[] = ""
 #endif
 ;
 
+#define VADE_VERSION_ STRINGIFY_(VADE_VERSION)
+
 void testing_Fail(void *opaque) {
     test_t *t = opaque;
     t->failures++;
@@ -58,60 +60,59 @@ void testing_Logf(void *opaque, const char *fmt, ...) {
 }
 
 int main(int argc, char *argv[]) {
-	int arg = 1;
-	if (arg < argc) {
-		if (strcmp(argv[arg], "--version")) {
-			printf("test version 0.0\n");
-			exit(0);
-		}
-	}
-	void *handle = dlopen(0, RTLD_NOW | RTLD_GLOBAL);
-	char *token = testing_syms;
-	printf("[==========] Running tests from test suite.\n");
-	printf("[----------] Global test environment set-up.\n");
-	struct timespec ts0, ts1;
-	clock_gettime(CLOCK_MONOTONIC, &ts0);
-	int ntests = 0;
-	int failed = 0;
-	while (*token) {
-		char *tokend = strchr(token, ' ');
-		if (tokend) {
-			*tokend++ = 0;
-		} else {
-			tokend = token + strlen(token);
-		}
-		const char *buf = token;
-		if (buf[0]) {
-			void *sym = dlsym(handle, buf);
-			if (sym) {
-				test_t t;
-				printf("[ RUN      ] %s\n", buf);
-				struct timespec tsa, tsb;
-				clock_gettime(CLOCK_MONOTONIC, &tsa);
-				testfunction tf = (testfunction)sym;
-				clock_gettime(CLOCK_MONOTONIC, &tsb);
-				long ns = 1000000000 * (tsb.tv_sec - tsa.tv_sec) + tsb.tv_nsec - tsa.tv_nsec;
-				long ms = ns / 1000000;
-				tf(&t);
-				if (t.failures > 0) {
-					printf("[  FAILED  ] %s (%ld ms)\n", buf, ms);
-					failed++;
-				} else {
-					printf("[       OK ] %s (%ld ms)\n", buf, ms);
-				}
-			} else {
-				printf("error: %s\n", dlerror());
-			}
-		}
-		token = tokend;
-		ntests++;
-	}
-	clock_gettime(CLOCK_MONOTONIC, &ts1);
-	long ns = 1000000000 * (ts1.tv_sec - ts0.tv_sec) + ts1.tv_nsec - ts0.tv_nsec;
-	long ms = ns / 1000000;
-	printf("[----------] Global test environment tear-down\n");
-	int passed = ntests - failed;
-	printf("[==========] %d tests from test suite ran. (%ld ms total)\n", ntests, ms);
+    int arg = 1;
+    if (arg < argc) {
+        if (!strcmp(argv[arg], "--version")) {
+            printf("test version %s\n", VADE_VERSION_);
+            exit(0);
+        }
+    }
+    void *handle = dlopen(0, RTLD_NOW | RTLD_GLOBAL);
+    char *token = testing_syms;
+    printf("[==========] Running tests from test suite.\n");
+    printf("[----------] Global test environment set-up.\n");
+    struct timespec ts0, ts1;
+    clock_gettime(CLOCK_MONOTONIC, &ts0);
+    int ntests = 0;
+    int failed = 0;
+    while (*token) {
+        char *tokend = strchr(token, ' ');
+        if (tokend) {
+            *tokend++ = 0;
+        } else {
+            tokend = token + strlen(token);
+        }
+        const char *buf = token;
+        if (buf[0]) {
+            void *sym = dlsym(handle, buf);
+            if (sym) {
+                test_t t;
+                printf("[ RUN      ] %s\n", buf);
+                struct timespec tsa, tsb;
+                clock_gettime(CLOCK_MONOTONIC, &tsa);
+                testfunction tf = (testfunction)sym;
+                clock_gettime(CLOCK_MONOTONIC, &tsb);
+                long ns = 1000000000 * (tsb.tv_sec - tsa.tv_sec) + tsb.tv_nsec - tsa.tv_nsec;
+                long ms = ns / 1000000;
+                tf(&t);
+                int is_fail = t.failures > 0;
+                if (is_fail) {
+                    failed++;
+                }
+                printf("[ %s ] %s (%ld ms)\n", is_fail ? " FAILED " : "      OK", buf, ms);
+            } else {
+                printf("error: %s\n", dlerror());
+            }
+        }
+        token = tokend;
+        ntests++;
+    }
+    clock_gettime(CLOCK_MONOTONIC, &ts1);
+    long ns = 1000000000 * (ts1.tv_sec - ts0.tv_sec) + ts1.tv_nsec - ts0.tv_nsec;
+    long ms = ns / 1000000;
+    printf("[----------] Global test environment tear-down\n");
+    int passed = ntests - failed;
+    printf("[==========] %d tests from test suite ran. (%ld ms total)\n", ntests, ms);
     if (passed)
         printf("[  PASSED  ] %d tests.\n", passed);
     if (failed)
