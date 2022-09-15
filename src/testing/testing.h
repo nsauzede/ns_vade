@@ -19,36 +19,29 @@
 #ifndef TESTING_H__
 #define TESTING_H__
 
+#include <stdio.h>
+
 /* In order to use lightwheight testing framework, for example to test the package 'foo/foo.c'
 you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' and 'testing/testing.h'
 
 testing/testing is provided in vade install tree
 
 The usage is simple :
-Create test APIs with testing_function_t signature, like :
-void foo_TestFoo(void *opaque);
+Create tests using the TEST_F(package, test) macro.
 
-where opaque is a testing private pointer, that must be passed to testing APIs.
+Then call other API macros to drive the test (TEST_LOG, EXPECT_TRUE, EXPECT_EQ. etc..)
 
 */
-
-// testing APIs include :
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-//typedef void (*testing_function_t)(void *opaque);
-
-void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
-
-//void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
-void testing_Fail(void *opaque);			// indicate a test failure
-
 /* declare a package test function */
 #define TEST_F(package, test) void package##_Test##test##_(void *test_opaque_)
 
-#define OPAQUE() __func__ ## opaque
+#define TEST_LOG(...) testing_Logf(test_opaque_, __VA_ARGS__)
+
 #define EXPECT_TRUE(bool_expr) \
     do { \
         int __func__##_bool_expr_ = bool_expr; \
@@ -87,6 +80,10 @@ void testing_Fail(void *opaque);			// indicate a test failure
 
 #define STRINGIFY_HELPER_(name, ...) #name
 #define STRINGIFY_(...) STRINGIFY_HELPER_(__VA_ARGS__, )
+
+void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
+//void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
+void testing_Fail(void *opaque);			// indicate a test failure
 
 #ifdef __cplusplus
 }

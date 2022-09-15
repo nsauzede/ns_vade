@@ -17,6 +17,9 @@
 */
 
 #define _POSIX_C_SOURCE 199309L
+
+#include "testing.h"
+
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,8 +27,6 @@
 #include <string.h>
 #include <dlfcn.h>
 #include <stdarg.h>
-
-#include "testing.h"
 
 typedef int Test;
 typedef void (*testfunction)(Test* t);
@@ -46,7 +47,7 @@ void testing_Fail(void *opaque) {
 
 void testing_Logf(void *opaque, const char *fmt, ...) {
 	if (opaque) {
-		printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
+//		printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
 	}
 	va_list ap;
 	va_start(ap, fmt);

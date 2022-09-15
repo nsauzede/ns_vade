@@ -16,13 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "bar/bar.h"
 #include "testing/testing.h"
 
-void bar_TestBar(void *t) {
-	int foo = 1;
-	int bar = bar_Bar(foo);
-	printf("%s: bar=%d t=%p\n", __func__, bar, t);
+TEST_F(bar, Bar) {
+	int foo = 708;
+	int bar = bar_Bar(1);
+	EXPECT_EQ(bar, foo);
 }

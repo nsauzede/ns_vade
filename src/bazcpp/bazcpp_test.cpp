@@ -20,7 +20,7 @@
 
 #include "testing/testing.h"
 
-void bazcpp_TestBazCPP(void *t) {
-	testing_Logf(t, "Testing bazcpp..\n");
+TEST_F(bazcpp, BazCPP) {
+	TEST_LOG("Testing bazcpp..\n");
 	A a;
 }
