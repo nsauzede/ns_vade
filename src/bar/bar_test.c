@@ -20,7 +20,7 @@
 #include "testing/testing.h"
 
 TEST_F(bar, Bar) {
-	int foo = 708;
-	int bar = bar_Bar(1);
-	EXPECT_EQ(bar, foo);
+    int foo = 708;
+    int bar = bar_Bar(1);
+    EXPECT_EQ(bar, foo);
 }

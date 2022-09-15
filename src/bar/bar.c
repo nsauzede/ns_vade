@@ -19,6 +19,6 @@
 #include "bar/bar.h"
 
 int bar_Bar(int foo) {
-	int bar = foo_Foo(foo);
-	return bar + 666;
+    int bar = foo_Foo(foo);
+    return bar + 666;
 }

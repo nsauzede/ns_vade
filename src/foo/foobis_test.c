@@ -16,15 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "foo/foo.h"
 #include "testing/testing.h"
 
-void foo_TestFoobis(void *t) {
-	printf("%s: t=%p\n", __func__, t);
+TEST_F(foo, Foobis) {
 }
 
-void foo_TestFoobis2(void *t) {
-	printf("%s: %p\n", __func__, t);
+TEST_F(foo, Foobis2) {
 }

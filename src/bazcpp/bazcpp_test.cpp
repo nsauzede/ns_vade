@@ -17,10 +17,11 @@
 */
 
 #include "bazcpp.h"
-
 #include "testing/testing.h"
 
 TEST_F(bazcpp, BazCPP) {
-	TEST_LOG("Testing bazcpp..\n");
-	A a;
+    TEST_LOG("Testing bazcpp..\n");
+    A a;
+    int answer = 42;
+    EXPECT_EQ(a.compute(), answer);
 }

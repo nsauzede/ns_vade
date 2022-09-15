@@ -17,5 +17,5 @@
 */
 
 int foo_Foo(int bar) {
-	return bar * 42;
+    return bar * 42;
 }

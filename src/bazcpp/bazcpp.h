@@ -18,5 +18,6 @@
 
 class A {
 public:
-	A();
+    A();
+    int compute();
 };

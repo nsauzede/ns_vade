@@ -16,10 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "bazcpp.h"
 
 A::A() {
-	printf("hello C++ baz\n");
+}
+
+int A::compute() {
+    return 42;
 }

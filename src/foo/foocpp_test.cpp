@@ -16,23 +16,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-
 #include "foo/foo.h"
 #include "testing/testing.h"
 
 class A {
 public:
-	A() {
-		printf("Hello C++\n");
-	}
-	A(int a) {
-		printf("Hello C++ - a=%d\n", a);
-	}
+    A():num(0) {}
+    A(int a):num(a) {}
+    int a() const { return num; }
+private:
+    int num;
 };
 
-void foo_TestFooCPP(void *t) {
-	A a2(2);
-	printf("%s: t=%p\n", __func__, t);
-	A a;
+TEST_F(foo, FooCPP) {
+    A a2(2);
+    EXPECT_EQ(a2.a(), 2);
+    A a;
+    EXPECT_EQ(a.a(), 0);
 }

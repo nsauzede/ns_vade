@@ -28,8 +28,11 @@
 #include <dlfcn.h>
 #include <stdarg.h>
 
-typedef int Test;
-typedef void (*testfunction)(Test* t);
+typedef struct {
+    int failures;
+    int verbose;
+} test_t;
+typedef void (*testfunction)(test_t* t);
 
 static char testing_syms[] = ""
 #ifndef TESTING_SYMS
@@ -40,19 +43,18 @@ static char testing_syms[] = ""
 ;
 
 void testing_Fail(void *opaque) {
-    Test *t = opaque;
-    *t = *t + 1;
-//    printf("%s: t=%d\n", __func__, *t);
+    test_t *t = opaque;
+    t->failures++;
 }
 
 void testing_Logf(void *opaque, const char *fmt, ...) {
-	if (opaque) {
-//		printf("%s: opaque=%p fmt=%s\n", __func__, opaque, fmt);
-	}
-	va_list ap;
-	va_start(ap, fmt);
-	vprintf(fmt, ap);
-	va_end(ap);
+    test_t *t = opaque;
+    if (t->verbose) {
+        va_list ap;
+        va_start(ap, fmt);
+        vprintf(fmt, ap);
+        va_end(ap);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -66,10 +68,11 @@ int main(int argc, char *argv[]) {
 	void *handle = dlopen(0, RTLD_NOW | RTLD_GLOBAL);
 	char *token = testing_syms;
 	printf("[==========] Running tests from test suite.\n");
-//	printf("[----------] testing_syms=[%s].\n", testing_syms);
 	printf("[----------] Global test environment set-up.\n");
 	struct timespec ts0, ts1;
 	clock_gettime(CLOCK_MONOTONIC, &ts0);
+	int ntests = 0;
+	int failed = 0;
 	while (*token) {
 		char *tokend = strchr(token, ' ');
 		if (tokend) {
@@ -81,34 +84,38 @@ int main(int argc, char *argv[]) {
 		if (buf[0]) {
 			void *sym = dlsym(handle, buf);
 			if (sym) {
-				Test t;
-//				printf("[----------] 2 tests from %s\n", buf);
+				test_t t;
 				printf("[ RUN      ] %s\n", buf);
 				struct timespec tsa, tsb;
 				clock_gettime(CLOCK_MONOTONIC, &tsa);
 				testfunction tf = (testfunction)sym;
-//				struct timespec sl = {0, 3500000};
-//				nanosleep(&sl, 0);
 				clock_gettime(CLOCK_MONOTONIC, &tsb);
 				long ns = 1000000000 * (tsb.tv_sec - tsa.tv_sec) + tsb.tv_nsec - tsa.tv_nsec;
 				long ms = ns / 1000000;
 				tf(&t);
-				if (t > 0)
+				if (t.failures > 0) {
 					printf("[  FAILED  ] %s (%ld ms)\n", buf, ms);
-				else
+					failed++;
+				} else {
 					printf("[       OK ] %s (%ld ms)\n", buf, ms);
+				}
 			} else {
 				printf("error: %s\n", dlerror());
 			}
 		}
 		token = tokend;
+		ntests++;
 	}
 	clock_gettime(CLOCK_MONOTONIC, &ts1);
 	long ns = 1000000000 * (ts1.tv_sec - ts0.tv_sec) + ts1.tv_nsec - ts0.tv_nsec;
 	long ms = ns / 1000000;
 	printf("[----------] Global test environment tear-down\n");
-	printf("[==========] 2 tests from 1 test suite ran. (%ld ms total)\n", ms);
-	printf("[  PASSED  ] 2 tests.\n");
-	dlclose(handle);
-	return 0;
+	int passed = ntests - failed;
+	printf("[==========] %d tests from test suite ran. (%ld ms total)\n", ntests, ms);
+    if (passed)
+        printf("[  PASSED  ] %d tests.\n", passed);
+    if (failed)
+        printf("[  FAILED  ] %d tests.\n", failed);
+    dlclose(handle);
+    return 0;
 }
