@@ -38,12 +38,55 @@ where opaque is a testing private pointer, that must be passed to testing APIs.
 extern "C" {
 #endif
 
-typedef void (*testing_function_t)(const void *opaque);
+//typedef void (*testing_function_t)(void *opaque);
 
-void testing_Logf(const void *opaque, const char *fmt, ...);		// printf-like API to output error message format
+void testing_Logf(void *opaque, const char *fmt, ...);		// printf-like API to output error message format
 
-void testing_Errorf(const void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
-void testing_Fail(const void *opaque);			// indicate a test failure
+//void testing_Errorf(void *opaque, const char *fmt, ...);	// printf-like API to output error message format and indicate test failure
+void testing_Fail(void *opaque);			// indicate a test failure
+
+/* declare a package test function */
+#define TEST_F(package, test) void package##_Test##test##_(void *test_opaque_)
+
+#define OPAQUE() __func__ ## opaque
+#define EXPECT_TRUE(bool_expr) \
+    do { \
+        int __func__##_bool_expr_ = bool_expr; \
+        int __func__##_expected_ = 1; \
+        /*printf("bool_expr=%d\n", __func__##_bool_expr_);*/ \
+        if (__func__##_bool_expr_ != __func__##_expected_) { \
+            printf("%s:%d: Failure\n", __FILE__, __LINE__); \
+            printf("Value of: %s\n", STRINGIFY_(bool_expr)); \
+            printf("  Actual: %d\n", __func__##_bool_expr_); \
+            printf("Expected: %d\n", __func__##_expected_); \
+            testing_Fail(test_opaque_); \
+            /*exit(1);*/ \
+        } else { \
+            /*printf("%s:%d: Success value of: %s\n", __FILE__, __LINE__, STRINGIFY_(bool_expr));*/ \
+        } \
+    } while(0)
+#define EXPECT_FALSE(bool_expr) EXPECT_TRUE(!(bool_expr))
+#define EXPECT_EQ(val1, val2) \
+    do { \
+        int __func__##_val1_ = val1; \
+        int __func__##_val2_ = val2; \
+        /*printf("bool_expr=%d\n", __func__##_bool_expr_);*/ \
+        if (__func__##_val1_ != __func__##_val2_) { \
+            printf("%s:%d: Failure\n", __FILE__, __LINE__); \
+            printf("Expected equality of these values:\n"); \
+            printf("  %s\n", STRINGIFY_(val1)); \
+            printf("    Which is: %d\n", __func__##_val1_); \
+            printf("  %s\n", STRINGIFY_(val2)); \
+            printf("    Which is: %d\n", __func__##_val2_); \
+            testing_Fail(test_opaque_); \
+            /*exit(1);*/ \
+        } else { \
+            /*printf("%s:%d: Success value of: %s\n", __FILE__, __LINE__, STRINGIFY_(bool_expr));*/ \
+        } \
+    } while(0)
+
+#define STRINGIFY_HELPER_(name, ...) #name
+#define STRINGIFY_(...) STRINGIFY_HELPER_(__VA_ARGS__, )
 
 #ifdef __cplusplus
 }

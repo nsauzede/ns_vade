@@ -143,14 +143,17 @@ pkg/testing/testing.o:
 
 lib%.a: %.a
 #	@echo "AUTO LIB tgt=$@ deps=$^"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 lib%.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 %_test.a: %_test.o
 #	@echo "AUTO test LIB tgt=$@ deps=$^"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 PROJ=$(patsubst %.a,%,$(@F))
@@ -159,11 +162,13 @@ ALIBOBJS+=$(patsubst src/$(PROJ)/%.o,pkg/$(PROJ)/%.o,$(patsubst %.cpp,%.o,$(pats
 %.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^ PROJ=$(PROJ)"
 	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 #	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).a STEM=$(PROJ) V=$(V)
 
 pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "lib%_test.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+	$(RM) -f $@
 	$(call BRIEF,AR) cr $@ $^
 
 LIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(STEM)/%_test.c,,$(wildcard src/$(STEM)/*.c))))
@@ -174,6 +179,7 @@ pkg/$(STEM)/lib%_test.a: pkg/$(STEM)/%_test.a
 #	$(AT)echo "3LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
@@ -181,6 +187,7 @@ pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "2LIBOBJS=$(2LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
@@ -188,6 +195,7 @@ pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
 #	$(AT)echo "0LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 DEPS=$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | $(VADEROOT)/deps.py)
@@ -199,6 +207,7 @@ pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
+	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
 bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
