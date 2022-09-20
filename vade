@@ -56,7 +56,7 @@ unset vadecalled vadebin vadefull vaderoot vade vadebinpath
 #echo "Fall through to the end of file !"
 else
 
-VADE_VERSION="0.1"
+VADE_VERSION="0.2"
 VADEVERSION="version"
 VADEHELP="help"
 VADEBUILD="build"

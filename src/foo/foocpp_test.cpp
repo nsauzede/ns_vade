@@ -17,7 +17,7 @@
 */
 
 #include "foo/foo.h"
-#include "testing/testing.h"
+#include "test/test.h"
 
 class A {
 public:

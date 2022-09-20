@@ -2,7 +2,7 @@
 Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, Python and Bash.
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
-Vade tries to bring its cool features (easy build, lightweight testing, ..) for C (C++) language.
+Vade tries to bring its cool features (easy build, lightweight test, ..) for C (C++) language.
 
 What it's not : a full replacement for Makefiles, especially for complex programs using fancy
 CFLAGS/CXXFLAGS/LDFLAGS.
@@ -53,7 +53,7 @@ $ vade help
 ## Writing unit tests
 Unit tests can be written in a given package, by creating `src/<pkg>/*_test.{c,cpp}` files.
 Each such test file can contain several test functions, which should be named like this: `void <pkg>_Test*(void *);`.
-The `void *` argument is an opaque pointer to be provided to the provided `testing` package (see vade sources).
+The `void *` argument is an opaque pointer to be provided to the provided `test` package (see vade sources).
 Note that the APIs and messages are heavily inspired from GoogleTest.
 
 Here is the simplest way to create a minimalist test/vade project:
@@ -66,7 +66,7 @@ $ echo -e '#include <stdio.h>\nvoid a_Test(void *) { printf("Hello vade!\\n"); }
 $ vade clean test
     AR  liba.a
     CC  a_test.o
-    CC  testing.o
+    CC  test.o
     AR  a_test.a
     AR  liba_test.a
     CXX a_test.exe

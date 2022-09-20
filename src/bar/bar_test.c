@@ -17,7 +17,7 @@
 */
 
 #include "bar/bar.h"
-#include "testing/testing.h"
+#include "test/test.h"
 
 TEST_F(bar, Bar) {
     int foo = 708;

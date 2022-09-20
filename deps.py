@@ -66,8 +66,8 @@ def dep(line):
                                 print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
                         if isheader(dfil):
-                                if dep.endswith("src/testing/testing.h"):
-                                        print(" pkg/%s/testing.o" % pkg)
+                                if dep.endswith("src/test/test.h"):
+                                        print(" pkg/%s/test.o" % pkg)
                                 else:
                                         if dpkg==pfx:
                                                 print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")

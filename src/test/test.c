@@ -18,7 +18,7 @@
 
 #define _POSIX_C_SOURCE 199309L
 
-#include "testing.h"
+#include "test.h"
 
 #include <time.h>
 #include <unistd.h>
@@ -34,22 +34,22 @@ typedef struct {
 } test_t;
 typedef void (*testfunction)(test_t* t);
 
-static char testing_syms[] = ""
-#ifndef TESTING_SYMS
-#error You must #define TESTING_SYMS as a list of test symbols (eg: "TestFoo", "TestBar", ...)
+static char test_syms[] = ""
+#ifndef TEST_SYMS
+#error You must #define TEST_SYMS as a list of test symbols (eg: "TestFoo", "TestBar", ...)
 #else
-	TESTING_SYMS
+	TEST_SYMS
 #endif
 ;
 
 #define VADE_VERSION_ STRINGIFY_(VADE_VERSION)
 
-void testing_Fail(void *opaque) {
+void test_Fail(void *opaque) {
     test_t *t = opaque;
     t->failures++;
 }
 
-void testing_Logf(void *opaque, const char *fmt, ...) {
+void test_Logf(void *opaque, const char *fmt, ...) {
     test_t *t = opaque;
     if (t->verbose) {
         va_list ap;
@@ -61,14 +61,18 @@ void testing_Logf(void *opaque, const char *fmt, ...) {
 
 int main(int argc, char *argv[]) {
     int arg = 1;
+    int verbose = 0;
     if (arg < argc) {
         if (!strcmp(argv[arg], "--version")) {
             printf("test version %s\n", VADE_VERSION_);
             exit(0);
         }
+        if (!strcmp(argv[arg], "-v")) {
+            verbose = 1;
+        }
     }
     void *handle = dlopen(0, RTLD_NOW | RTLD_GLOBAL);
-    char *token = testing_syms;
+    char *token = test_syms;
     printf("[==========] Running tests from test suite.\n");
     printf("[----------] Global test environment set-up.\n");
     struct timespec ts0, ts1;
@@ -86,7 +90,7 @@ int main(int argc, char *argv[]) {
         if (buf[0]) {
             void *sym = dlsym(handle, buf);
             if (sym) {
-                test_t t;
+                test_t t = { .verbose = verbose };
                 printf("[ RUN      ] %s\n", buf);
                 struct timespec tsa, tsb;
                 clock_gettime(CLOCK_MONOTONIC, &tsa);

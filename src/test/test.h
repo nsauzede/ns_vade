@@ -16,15 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TESTING_H__
-#define TESTING_H__
+#ifndef TEST_H__
+#define TEST_H__
 
 #include <stdio.h>
 
-/* In order to use lightwheight testing framework, for example to test the package 'foo/foo.c'
-you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' and 'testing/testing.h'
+/* In order to use lightwheight test framework, for example to test the package 'foo/foo.c'
+you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' and 'test/test.h'
 
-testing/testing is provided in vade install tree
+test/test is provided in vade install tree
 
 The usage is simple :
 Create tests using the TEST_F(package, test) macro.
@@ -40,7 +40,17 @@ extern "C" {
 /* declare a package test function */
 #define TEST_F(package, test) void package##_Test##test##_(void *test_opaque_)
 
-#define TEST_LOG(...) testing_Logf(test_opaque_, __VA_ARGS__)
+#define TEST_LOG(...) test_Logf(test_opaque_, __VA_ARGS__)
+
+#define EXPECT_TRUE_OR(bool_expr, fmt, ...) \
+    do { \
+        int __func__##_bool_expr_ = bool_expr; \
+        int __func__##_expected_ = 1; \
+        if (__func__##_bool_expr_ != __func__##_expected_) { \
+            printf(fmt, __VA_ARGS__); \
+            test_Fail(test_opaque_); \
+        } \
+    } while(0)
 
 #define EXPECT_TRUE(bool_expr) \
     do { \
@@ -51,10 +61,12 @@ extern "C" {
             printf("Value of: %s\n", STRINGIFY_(bool_expr)); \
             printf("  Actual: %d\n", __func__##_bool_expr_); \
             printf("Expected: %d\n", __func__##_expected_); \
-            testing_Fail(test_opaque_); \
+            test_Fail(test_opaque_); \
         } \
     } while(0)
+
 #define EXPECT_FALSE(bool_expr) EXPECT_TRUE(!(bool_expr))
+
 #define EXPECT_EQ(val1, val2) \
     do { \
         int __func__##_val1_ = val1; \
@@ -66,18 +78,18 @@ extern "C" {
             printf("    Which is: %d\n", __func__##_val1_); \
             printf("  %s\n", STRINGIFY_(val2)); \
             printf("    Which is: %d\n", __func__##_val2_); \
-            testing_Fail(test_opaque_); \
+            test_Fail(test_opaque_); \
         } \
     } while(0)
 
 #define STRINGIFY_HELPER_(name, ...) #name
 #define STRINGIFY_(...) STRINGIFY_HELPER_(__VA_ARGS__, )
 
-void testing_Logf(void *opaque, const char *fmt, ...);          // printf-like API to output error message format
-void testing_Fail(void *opaque);                                // indicate a test failure
+void test_Logf(void *opaque, const char *fmt, ...);          // printf-like API to output error message format
+void test_Fail(void *opaque);                                // indicate a test failure
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif/*TESTING_H__*/
+#endif/*TEST_H__*/

@@ -17,7 +17,7 @@
 */
 
 #include "bazcpp.h"
-#include "testing/testing.h"
+#include "test/test.h"
 
 TEST_F(bazcpp, BazCPP) {
     TEST_LOG("Testing bazcpp..\n");
