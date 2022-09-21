@@ -51,7 +51,7 @@ void test_Fail(void *opaque) {
 
 void test_Logf(void *opaque, const char *fmt, ...) {
     test_t *t = opaque;
-    if (t->verbose) {
+    if (t->verbose || t->failures > 0) {
         va_list ap;
         va_start(ap, fmt);
         vprintf(fmt, ap);

@@ -50,16 +50,15 @@ extern "C" {
     do { \
         int __func__##_bool_expr_ = bool_expr; \
         int __func__##_expected_ = 1; \
+        int failed = 0; \
         if (__func__##_bool_expr_ != __func__##_expected_) { \
             printf("%s:%d: %sFailure%s\n", __FILE__, __LINE__, RED(), NRM()); \
-            printf(fmt, __VA_ARGS__); \
             test_Fail(test_opaque_); \
+            failed = 1; \
         } else { \
             TEST_LOG("%s:%d: %sSuccess%s\n", __FILE__, __LINE__, GREEN(), NRM()); \
-            TEST_LOG("Value of: %s\n", STRINGIFY_(bool_expr)); \
-            TEST_LOG("  Actual: %d\n", __func__##_bool_expr_); \
-            TEST_LOG("Expected: %d\n", __func__##_expected_); \
         } \
+        TEST_LOG(fmt, __VA_ARGS__); \
     } while(0)
 
 #define EXPECT_TRUE(bool_expr) EXPECT_OR(bool_expr, "Value of: %s\n  Actual: %d\nExpected: %d\n", STRINGIFY_(bool_expr), __func__##_bool_expr_, __func__##_expected_)
