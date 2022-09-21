@@ -66,8 +66,6 @@ extern "C" {
 
 #define EXPECT_FALSE(bool_expr) EXPECT_TRUE(!(bool_expr))
 
-#define Z2EXPECT_EQ(val1, val2) EXPECT_OR(val1 == val2, "Expected equality of these values:\n  %s\n    Which is: %d\n  %s\n    Which is: %d\n", STRINGIFY_(val1), __func__##_val1_, STRINGIFY_(val2), __func__##_val2_)
-
 #define EXPECT_EQ(val1, val2) \
     do { \
         int __func__##_val1_ = val1; \
@@ -75,26 +73,11 @@ extern "C" {
         EXPECT_OR(val1 == val2, "Expected equality of these values:\n  %s\n    Which is: %d\n  %s\n    Which is: %d\n", STRINGIFY_(val1), __func__##_val1_, STRINGIFY_(val2), __func__##_val2_); \
     } while(0)
 
-#define Z1EXPECT_EQ(val1, val2) \
+#define EXPECT_STREQ(s1, s2) \
     do { \
-        int __func__##_val1_ = val1; \
-        int __func__##_val2_ = val2; \
-        if (__func__##_val1_ != __func__##_val2_) { \
-            printf("%s:%d: Failure\n", __FILE__, __LINE__); \
-            printf("Expected equality of these values:\n"); \
-            printf("  %s\n", STRINGIFY_(val1)); \
-            printf("    Which is: %d\n", __func__##_val1_); \
-            printf("  %s\n", STRINGIFY_(val2)); \
-            printf("    Which is: %d\n", __func__##_val2_); \
-            test_Fail(test_opaque_); \
-        } else { \
-            TEST_LOG("%s:%d: Success\n", __FILE__, __LINE__); \
-            TEST_LOG("Equality of these values:\n"); \
-            TEST_LOG("  %s\n", STRINGIFY_(val1)); \
-            TEST_LOG("    Which is: %d\n", __func__##_val1_); \
-            TEST_LOG("  %s\n", STRINGIFY_(val2)); \
-            TEST_LOG("    Which is: %d\n", __func__##_val2_); \
-        } \
+        char *__func__##_s1_ = s1; \
+        char *__func__##_s2_ = s2; \
+        EXPECT_OR(!strcmp(s1, s2), "Expected equality of these strings:\n  %s\n    Which is: [%s]\n  %s\n    Which is: [%s]\n", STRINGIFY_(s1), __func__##_s1_, STRINGIFY_(s2), __func__##_s2_); \
     } while(0)
 
 #define STRINGIFY_HELPER_(name, ...) #name
