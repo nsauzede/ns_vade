@@ -122,5 +122,5 @@ int main(int argc, char *argv[]) {
     if (failed)
         printf("[  FAILED  ] %d tests.\n", failed);
     dlclose(handle);
-    return 0;
+    return failed > 0;
 }

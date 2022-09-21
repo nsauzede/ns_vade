@@ -277,7 +277,7 @@ $(PKGS): pkg/vade_dep.d
 .PHONY:$(RUN_TESTS)
 
 $(RUN_TESTS):
-	$(call BRIEF2,RUN,./$(@D)) ./$(@D) $(TFLAGS)
+	$(call BRIEF2,RUN,./$(@D)) ./$(@D) $(TFLAGS) || exit $$?
 #	$(call BRIEF2,RUN,./$(@F)) ./$(@F)
 
 _check: $(RUN_TESTS)
