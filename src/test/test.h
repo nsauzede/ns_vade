@@ -59,6 +59,7 @@ extern "C" {
             TEST_LOG("%s:%d: %sSuccess%s\n", __FILE__, __LINE__, GREEN(), NRM()); \
         } \
         TEST_LOG(fmt, __VA_ARGS__); \
+        if (failed) return; \
     } while(0)
 
 #define EXPECT_TRUE(bool_expr) EXPECT_OR(bool_expr, "Value of: %s\n  Actual: %d\nExpected: %d\n", STRINGIFY_(bool_expr), __func__##_bool_expr_, __func__##_expected_)
@@ -69,14 +70,14 @@ extern "C" {
     do { \
         int __func__##_val1_ = val1; \
         int __func__##_val2_ = val2; \
-        EXPECT_OR(val1 == val2, "Expected equality of these values:\n  %s\n    Which is: %d\n  %s\n    Which is: %d\n", STRINGIFY_(val1), __func__##_val1_, STRINGIFY_(val2), __func__##_val2_); \
+        EXPECT_OR(val1 == val2, "Expected equality of these values:\n  {%s}    Which is: %d\n  {%s}    Which is: %d\n", STRINGIFY_(val1), __func__##_val1_, STRINGIFY_(val2), __func__##_val2_); \
     } while(0)
 
 #define EXPECT_STREQ(s1, s2) \
     do { \
         char *__func__##_s1_ = s1; \
         char *__func__##_s2_ = s2; \
-        EXPECT_OR(!strcmp(s1, s2), "Expected equality of these strings:\n  %s\n    Which is: [%s]\n  %s\n    Which is: [%s]\n", STRINGIFY_(s1), __func__##_s1_, STRINGIFY_(s2), __func__##_s2_); \
+        EXPECT_OR(!strcmp(s1, s2), "Expected equality of these strings:\n  {%s}    Which is: [%s]\n  {%s}    Which is: [%s]\n", STRINGIFY_(s1), __func__##_s1_, STRINGIFY_(s2), __func__##_s2_); \
     } while(0)
 
 #define STRINGIFY_HELPER_(name, ...) #name
