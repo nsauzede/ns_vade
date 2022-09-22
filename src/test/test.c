@@ -90,6 +90,7 @@ int main(int argc, char *argv[]) {
         if (buf[0]) {
             void *sym = dlsym(handle, buf);
             if (sym) {
+                ntests++;
                 test_t t = { .verbose = verbose };
                 printf("[ RUN      ] %s\n", buf);
                 struct timespec tsa, tsb;
@@ -104,12 +105,12 @@ int main(int argc, char *argv[]) {
                     failed++;
                 }
                 printf("[ %s ] %s (%ld ms)\n", is_fail ? " FAILED " : "      OK", buf, ms);
+                if (failed > 0) break;
             } else {
                 printf("error: %s\n", dlerror());
             }
         }
         token = tokend;
-        ntests++;
     }
     clock_gettime(CLOCK_MONOTONIC, &ts1);
     long ns = 1000000000 * (ts1.tv_sec - ts0.tv_sec) + ts1.tv_nsec - ts0.tv_nsec;
