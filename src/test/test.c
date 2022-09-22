@@ -119,9 +119,9 @@ int main(int argc, char *argv[]) {
     int passed = ntests - failed;
     printf("[==========] %d tests from test suite ran. (%ld ms total)\n", ntests, ms);
     if (passed)
-        printf("[  PASSED  ] %d tests.\n", passed);
+        printf("[  %sPASSED%s  ] %d tests.\n", GREEN(), NRM(), passed);
     if (failed)
-        printf("[  FAILED  ] %d tests.\n", failed);
+        printf("[  %sFAILED%s  ] %d tests.\n", RED(), NRM(), failed);
     dlclose(handle);
     return failed > 0;
 }
