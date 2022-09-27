@@ -20,6 +20,7 @@
 #define TEST_H__
 
 #include <stdio.h>
+#include <string.h>
 
 /* In order to use lightwheight test framework, for example to test the package 'foo/foo.c'
 you must create a separate file 'foo/foo_test.c' that includes both 'foo/foo.h' and 'test/test.h'
