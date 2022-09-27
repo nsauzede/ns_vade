@@ -76,8 +76,8 @@ $ vade clean test
     RUN ./bin/a_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
-[ RUN      ] a_TestA_
-[       OK ] a_TestA_ (0 ms)
+[ RUN      ] a_TestMock_
+[       OK ] a_TestMock_ (0 ms)
 [----------] Global test environment tear-down
 [==========] 1 tests from test suite ran. (1 ms total)
 [  PASSED  ] 1 tests.

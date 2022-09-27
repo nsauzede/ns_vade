@@ -199,14 +199,14 @@ ${VADENEW}) :
         echo "#ifndef ${PKG^^}_H__"
         echo "#define ${PKG^^}_H__"
         echo ""
-        echo "int ${PKG}_${PKG^}();"
+        echo "int ${PKG}_Mock();"
         echo ""
         echo "#endif/*${PKG^^}_H__*/"
     } > ${VADEPATH}/src/${PKG}/${PKG}.h
     {
         echo '#include "'"${PKG}.h"'"'
         echo ""
-        echo "int ${PKG}_${PKG^}() {"
+        echo "int ${PKG}_Mock() {"
         echo "    return 42;"
         echo "}"
     } > ${VADEPATH}/src/${PKG}/${PKG}.c
@@ -214,9 +214,9 @@ ${VADENEW}) :
         echo '#include "'"${PKG}.h"'"'
         echo '#include "'"test/test.h"'"'
         echo ""
-        echo "TEST_F(${PKG}, ${PKG^}) {"
+        echo "TEST_F(${PKG}, Mock) {"
         echo '    TEST_LOG("Testing '"${PKG}"'..\n");'
-        echo "    EXPECT_EQ(42, ${PKG}_${PKG^}());"
+        echo "    EXPECT_EQ(42, ${PKG}_Mock());"
         echo "}"
     } > ${VADEPATH}/src/${PKG}/${PKG}_test.c
     ;;
