@@ -1,5 +1,5 @@
 # Vade
-Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, Python and Bash.
+TDD-driven, Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, Python and Bash.
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
 Vade tries to bring its cool features (easy build, lightweight test, ..) for C (C++) language.
