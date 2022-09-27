@@ -56,14 +56,17 @@ Each such test file can contain several test functions, which should be named li
 The `void *` argument is an opaque pointer to be provided to the provided `test` package (see vade sources).
 Note that the APIs and messages are heavily inspired from GoogleTest.
 
-Here is the simplest way to create a minimalist test/vade project:
+Here is the simplest way to create a minimalist test/vade project: (the `git init` convenience is to avoid setting VADEPATH)
 ```
 $ mkdir myproj
 $ cd myproj
 $ git init
-$ mkdir -p src/a
-$ echo -e '#include <stdio.h>\nvoid a_Test(void *) { printf("Hello vade!\\n"); }' > src/a/a_test.c
+$ vade new a
 $ vade clean test
+    RM  pkg
+    RM  bin
+    CC  a.o
+    AR  a.a
     AR  liba.a
     CC  a_test.o
     CC  test.o
@@ -71,7 +74,13 @@ $ vade clean test
     AR  liba_test.a
     CXX a_test.exe
     RUN ./bin/a_test.exe
-Hello vade!
+[==========] Running tests from test suite.
+[----------] Global test environment set-up.
+[ RUN      ] a_TestA_
+[       OK ] a_TestA_ (0 ms)
+[----------] Global test environment tear-down
+[==========] 1 tests from test suite ran. (1 ms total)
+[  PASSED  ] 1 tests.
 ```
 
 Enjoy !

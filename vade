@@ -34,20 +34,20 @@ vadebinpath=${vaderoot}
 # add vade program path to PATH
 #echo "Checking if ${vadebinpath} is in PATH.."
 if [ -d "${vadebinpath}" ] && [[ ":$PATH:" != *":${vadebinpath}:"* ]]; then
-#	echo "Adding ${vadebinpath} to PATH"
-	PATH="${PATH:+"$PATH:"}${vadebinpath}"
+#    echo "Adding ${vadebinpath} to PATH"
+    PATH="${PATH:+"$PATH:"}${vadebinpath}"
 fi
 
 # add vade autocompletion
 #echo "Setting up '${vade}' autocompletion"
 _vade()
 {
-	local cur opts
-	COMPREPLY=()
-	cur="${COMP_WORDS[COMP_CWORD]}"
-	opts=$(vade complete)
-	COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-	return 0
+    local cur opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    opts=$(vade complete)
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
 }
 complete -o nospace -F _vade ${vade}
 
@@ -59,6 +59,7 @@ else
 VADE_VERSION="0.2"
 VADEVERSION="version"
 VADEHELP="help"
+VADENEW="new"
 VADEBUILD="build"
 VADECLEAN="clean"
 VADETEST="test"
@@ -68,8 +69,8 @@ VADEBIN=$0
 VADECMD=$1
 
 if [ "x${VADECMD}" = "xcomplete" ]; then
-	echo "$VADECMDS"
-	exit 0
+    echo "$VADECMDS"
+    exit 0
 fi
 
 #echo "Script is a subshell CMD=$VADECMD"
@@ -91,7 +92,7 @@ VADEBINPATH=${VADEROOT}
 : ${VADEPATH:=`git rev-parse --show-toplevel 2> /dev/null || echo ${HOME}/vade`}
 # Else 3) fallback to vade root itself.
 if [ ! -d "${VADEPATH}" ]; then
-	VADEPATH=${VADEROOT}
+    VADEPATH=${VADEROOT}
 fi
 
 #echo "VADEBIN=${VADEBIN}"
@@ -106,15 +107,15 @@ fi
 SILENCEMAKE=--no-print-directory
 
 #if [ "x${VADECMD}" = "x${VADECOMPLETE}" ]; then
-#	echo "${VADECMDS}"
-#	exit 0
+#    echo "${VADECMDS}"
+#    exit 0
 #elif [ "x${VADECMD}" != "x" ]; then
 if [ "x${VADECMD}" != "x" ]; then
-#	VADECMD="help"
+#    VADECMD="help"
 #else
-	shift
-	VADESUBCMD=$1
-	VADEARGS=$*
+    shift
+    VADESUBCMD=$1
+    VADEARGS=$*
 fi
 
 #echo "VADESUBCMD=${VADESUBCMD}"
@@ -122,74 +123,118 @@ fi
 
 case ${VADECMD} in
 ${VADEVERSION}) :
-	echo "Vade version ${VADE_VERSION}"
-	exit 0
-	;;
+    echo "Vade version ${VADE_VERSION}"
+    exit 0
+    ;;
+${VADENEW}) :
+    if [ "x${VADESUBCMD}" == "x" ]; then
+        echo "Package name required"
+        exit 1
+    fi
+    if [ -d ${VADEPATH}/src/${VADESUBCMD} ]; then
+        echo "Package ${VADESUBCMD} already exists (${VADEPATH})"
+        exit 1
+    fi
+    PKG=${VADESUBCMD}
+    ;;
 "" | ${VADEHELP}) :
-	case ${VADESUBCMD} in
-	"") :
-		echo -e "Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)"
-		echo -e ""
-		echo -e "Usage:"
-		echo -e ""
-		echo -e "\t${VADE} command [arguments]"
-		echo -e ""
-		echo -e "The commands are:"
-		echo -e ""
-		echo -e "\t${VADEHELP} [cmd]\tshow help (or cmd help)"
-		echo -e "\t${VADEVERSION}\t\tshow vade version"
-		echo -e "\t${VADEBUILD}\t\tcompile packages and dependencies"
-		echo -e "\t${VADECLEAN}\t\tremove object files"
-		echo -e "\t${VADETEST}\t\ttest packages"
-		echo -e ""
-		if [ "x${VADECMD}" = "xhelp" ]; then
-			exit 0
-		else
-			exit 2
-		fi
-		;;
-	${VADEBUILD}) :
-		echo "Usage: ${VADE} ${VADESUBCMD} [-o output] [-i] [build flags] [packages]"
-		echo ""
-		exit 0
-		;;
-	${VADECLEAN}) :
-		echo "Usage: ${VADE} ${VADESUBCMD} [-i] [-r] [-n] [-x] [build flags] [packages]"
-		echo ""
-		exit 0
-		;;
-	${VADETEST}) :
-		echo "Usage: ${VADE} ${VADESUBCMD} [build/test flags] [packages] [build/test flags & test binary flags]"
-		echo ""
-		exit 0
-		;;
-	*) :
-		echo "Unknown help topic `${VADESUBCMD}`.  Run '${VADE} help'."
-		echo ""
-		exit 2
-		;;
-	esac
-	;;
+    case ${VADESUBCMD} in
+    "") :
+        echo -e "Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)"
+        echo -e ""
+        echo -e "Usage:"
+        echo -e ""
+        echo -e "\t${VADE} command [arguments]"
+        echo -e ""
+        echo -e "The commands are:"
+        echo -e ""
+        echo -e "\t${VADEHELP} [cmd]\tshow help (or cmd help)"
+        echo -e "\t${VADEVERSION}\t\tshow vade version"
+        echo -e "\t${VADENEW}\t\tcreate a new source package"
+        echo -e "\t${VADEBUILD}\t\tcompile packages and dependencies"
+        echo -e "\t${VADECLEAN}\t\tremove object files"
+        echo -e "\t${VADETEST}\t\ttest packages"
+        echo -e ""
+        if [ "x${VADECMD}" = "xhelp" ]; then
+            exit 0
+        else
+            exit 2
+        fi
+        ;;
+    ${VADENEW}) :
+        echo "Usage: ${VADE} ${VADESUBCMD} <packagename>"
+        echo ""
+        exit 0
+        ;;
+    ${VADEBUILD}) :
+        echo "Usage: ${VADE} ${VADESUBCMD} [-o output] [-i] [build flags] [packages]"
+        echo ""
+        exit 0
+        ;;
+    ${VADECLEAN}) :
+        echo "Usage: ${VADE} ${VADESUBCMD} [-i] [-r] [-n] [-x] [build flags] [packages]"
+        echo ""
+        exit 0
+        ;;
+    ${VADETEST}) :
+        echo "Usage: ${VADE} ${VADESUBCMD} [build/test flags] [packages] [build/test flags & test binary flags]"
+        echo ""
+        exit 0
+        ;;
+    *) :
+        echo "Unknown help topic `${VADESUBCMD}`.  Run '${VADE} help'."
+        echo ""
+        exit 2
+        ;;
+    esac
+    ;;
 esac
 
 test -d ${VADEPATH} || (echo "can't load package: package .: no buildable source files in ${VADEPATH}" ; exit 1)
 
 case ${VADECMD} in
+${VADENEW}) :
+    mkdir -p ${VADEPATH}/src/${PKG}
+    {
+        echo "#ifndef ${PKG^^}_H__"
+        echo "#define ${PKG^^}_H__"
+        echo ""
+        echo "int ${PKG}_${PKG^}();"
+        echo ""
+        echo "#endif/*${PKG^^}_H__*/"
+    } > ${VADEPATH}/src/${PKG}/${PKG}.h
+    {
+        echo '#include "'"${PKG}.h"'"'
+        echo ""
+        echo "int ${PKG}_${PKG^}() {"
+        echo "    return 42;"
+        echo "}"
+    } > ${VADEPATH}/src/${PKG}/${PKG}.c
+    {
+        echo '#include "'"${PKG}.h"'"'
+        echo '#include "'"test/test.h"'"'
+        echo ""
+        echo "TEST_F(${PKG}, ${PKG^}) {"
+        echo '    TEST_LOG("Testing '"${PKG}"'..\n");'
+        echo "    EXPECT_EQ(42, ${PKG}_${PKG^}());"
+        echo "}"
+    } > ${VADEPATH}/src/${PKG}/${PKG}_test.c
+    ;;
 ${VADEBUILD}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
-	;;
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    ;;
 ${VADECLEAN}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
-	;;
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    ;;
 ${VADETEST}) :
-	make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
-	;;
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    ;;
 *) :
-	echo "${VADE}: unknown command \"${VADECMD}\""
-	echo "Run '${VADE} help' for usage."
-	echo ""
-	exit 2
-	;;
+    echo "${VADE}: unknown command \"${VADECMD}\""
+    echo "Run '${VADE} help' for usage."
+    echo ""
+    exit 2
+    ;;
 esac
 
 fi
