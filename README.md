@@ -1,4 +1,6 @@
 # Vade
+[![Build Status][WorkflowBadge]][WorkflowUrl]
+
 TDD-driven, Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, Python and Bash.
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
@@ -84,3 +86,6 @@ $ vade clean test
 ```
 
 Enjoy !
+
+[WorkflowBadge]: https://github.com/nsauzede/vade/workflows/vade/badge.svg
+[WorkflowUrl]: https://github.com/nsauzede/vade/commits/main

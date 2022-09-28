@@ -1,0 +1,19 @@
+name: vade
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install dependencies
+        run: sudo apt install --quiet -y make gcc python3 bash
+      - name: Build and test
+        run: ./vade clean test
