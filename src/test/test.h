@@ -76,8 +76,8 @@ extern "C" {
 
 #define EXPECT_STREQ(s1, s2) \
     do { \
-        char *__func__##_s1_ = s1; \
-        char *__func__##_s2_ = s2; \
+        const char *__func__##_s1_ = s1; \
+        const char *__func__##_s2_ = s2; \
         EXPECT_OR(!strcmp(__func__##_s1_, __func__##_s2_), "Expected equality of these strings:\n  {%s}    Which is: [%s]\n  {%s}    Which is: [%s]\n", STRINGIFY_(s1), __func__##_s1_, STRINGIFY_(s2), __func__##_s2_); \
     } while(0)
 
@@ -92,8 +92,8 @@ extern "C" {
 
 #define EXPECT_MEMEQ(s1, s2, sz) \
     do { \
-        unsigned char *__func__##_s1_ = s1; \
-        unsigned char *__func__##_s2_ = s2; \
+        const unsigned char *__func__##_s1_ = s1; \
+        const unsigned char *__func__##_s2_ = s2; \
         DUMP_MEM(STRINGIFY_(s1), __func__##_s1_, sz); \
         DUMP_MEM(STRINGIFY_(s2), __func__##_s2_, sz); \
         EXPECT_OR(!memcmp(__func__##_s1_, __func__##_s2_, sz), "Expected equality of these data:\n  {%s}    Which is: ??\n  {%s}    Which is: ??\n", STRINGIFY_(s1), STRINGIFY_(s2)); \
