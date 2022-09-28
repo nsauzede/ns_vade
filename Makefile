@@ -31,8 +31,8 @@ LIBS=$(patsubst src/%,pkg/lib%.a,$(SRCS))
 
 TESTS=$(patsubst %,bin/%_test.exe,$(DIRS))
 #RUN_TESTS=$(patsubst %,bin/%_test.exe/RUN,$(DIRS))
-#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*_test.exe))
-RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*.exe))
+RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*_test.exe))
+#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*.exe))
 
 _AT_=@
 _AT_1=
