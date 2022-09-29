@@ -1,7 +1,7 @@
 # Vade
 [![Build Status][WorkflowBadge]][WorkflowUrl]
 
-TDD-driven, Go-inspired (golang) tool for managing C/C++ source code, based on GNU Make, Python and Bash.
+TDD-driven, Go-inspired (golang) tool for building/testing C/C++ source code, based on GNU Make, GCC, NASM, Python and Bash.
 
 The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
 Vade tries to bring its cool features (easy build, lightweight test, ..) for C (C++) language.
@@ -9,6 +9,7 @@ Vade tries to bring its cool features (easy build, lightweight test, ..) for C (
 What it's not : a full replacement for Makefiles, especially for complex programs using fancy
 CFLAGS/CXXFLAGS/LDFLAGS.
 It is mainly targetting C; for C++ it might be more appropriate to use other tools, eg: GoogleTest.
+It can also handle assembly files with NASM to produce bare binaries.
 
 It's suitable for simple (yet potentially  interdependent) packages.
 The only caveat is if your packages depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz)

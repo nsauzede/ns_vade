@@ -22,6 +22,7 @@ VADEMAKEINTERNAL:=make -f $(VADEROOT)/Makefile_internal SILENTMAKE=$(SILENTMAKE)
 
 AR:=ar
 NM:=nm
+NASM:=nasm
 
 #SRCS=$(patsubst src/test,,$(wildcard src/*))
 SRCS=$(wildcard src/*)
@@ -106,15 +107,21 @@ pkg bin:
 
 DEPSCFILES=$(patsubst src/$(STEM)/%.c,$(STEM)/%,$(wildcard src/$(STEM)/*.c))
 DEPSCPPFILES=$(patsubst src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard src/$(STEM)/*.cpp))
+DEPSASMFILES=$(patsubst src/$(STEM)/%.asm,$(STEM)/%,$(wildcard src/$(STEM)/*.asm))
 pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSCFILES=$(DEPSCFILES)"
 #	$(AT)echo "DEPSCPPFILES=$(DEPSCPPFILES)"
+#	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
-	$(AT)for cf in $(DEPSCFILES); do \
-		$(CC) -MM -MT "pkg/$$cf.o" src/$$cf.c $(CFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
+	$(AT)for f in $(DEPSCFILES); do \
+		$(CC) -MM -MT "pkg/$$f.o" src/$$f.c $(CFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
 	done
-	$(AT)for cf in $(DEPSCPPFILES); do \
-		$(CXX) -MM -MT "pkg/$$cf.o" src/$$cf.cpp $(CXXFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
+	$(AT)for f in $(DEPSCPPFILES); do \
+		$(CXX) -MM -MT "pkg/$$f.o" src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
+	done
+	$(AT)for f in $(DEPSASMFILES); do \
+		echo "pkg/$$f.bin: src/$$f.asm" >> $@ || exit 1; \
+		echo "pkg/$(STEM)/lib$(STEM).a: | pkg/$$f.bin" >> $@ || exit 1 ; \
 	done
 	$(AT)cat $@ >> pkg/vade_dep.d
 
@@ -206,6 +213,10 @@ pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
+pkg/$(STEM)/%.bin: src/$(STEM)/%.asm
+#	echo "DOING bin/%.bin for STEM=$(STEM)"
+	$(NASM) -o $@ $<
+
 DEPS=$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | $(VADEROOT)/deps.py)
 #DEPS=$(patsubst %.h,%.o,$(patsubst src/%,pkg/%,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "test" | grep '.h' | cut -f 3 -d " ")))
 #pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
@@ -243,6 +254,7 @@ bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 
 bin/%.exe: $(LIB) | $(LIB)
+#	echo "DOING bin/%.exe for STEM=$(STEM)"
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
 .PHONY:$(PKGS)
