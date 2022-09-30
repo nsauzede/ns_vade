@@ -1,2 +1,0 @@
-include $(VADEROOT)/Makefile
-include pkg/vade_dep.d

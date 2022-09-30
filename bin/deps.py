@@ -17,21 +17,21 @@ def isheader(fil):
 def dep(line):
         print("%s" % line)
         ls=line.split(".o: ")
-#        print("ls=%s" % ls)
+        print("ls=%s" % ls)
         rule=ls[0].split("/")
-        if len(rule) < 3:
+        if len(rule) < 4:
                 return
-        pkg=rule[1]
-        tgt=rule[2]
+        pkg=rule[2]
+        tgt=rule[3]
         if len(ls) < 2:
                 return
         deps=ls[1]
         if pkg != tgt:
                 pass
-#        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
-#        print("deps=%s" % deps)
-        print("pkg/%s/%s.a: pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
-#        print("pkg/%s/%s.a:" % (pkg, tgt), end="")
+        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
+        print("deps=%s" % deps)
+        print("vade/pkg/%s/%s.a: vade/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
+#        print("vade/pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 dls = dep.split("/")
                 ddir = dls[-3]
@@ -42,15 +42,15 @@ def dep(line):
                         continue
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
-                                if os.path.isfile("src/%s/%s.c" % (dpkg, pfx)) or \
-                                        os.path.isfile("src/%s/%s.cpp" % (dpkg, pfx)):
-                                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
+                                if os.path.isfile("vade/src/%s/%s.c" % (dpkg, pfx)) or \
+                                        os.path.isfile("vade/src/%s/%s.cpp" % (dpkg, pfx)):
+                                                print(" vade/pkg/%s/%s.o" % (dpkg, pfx), end="")
                 else:
                         if not isheader(dfil):
-                                print(" pkg/%s/%s.o" % (dpkg, pfx), end="")
+                                print(" vade/pkg/%s/%s.o" % (dpkg, pfx), end="")
         print()
         ddeps=[]
-        print("pkg/%s/lib%s.a:" % (pkg, tgt), end="")
+        print("vade/pkg/%s/lib%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 dls = dep.split("/")
                 ddir = dls[-3]
@@ -60,32 +60,32 @@ def dep(line):
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
                                 if dpkg!=pkg:
-                                        print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
+                                        print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
                                         ddeps += [dpkg]
                         else:
-                                print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
                         if isheader(dfil):
-                                if dep.endswith("src/test/test.h"):
-                                        print(" pkg/%s/test.o" % pkg)
+                                if dep.endswith("vade/src/test/test.h"):
+                                        print(" vade/pkg/%s/test.o" % pkg)
                                 else:
                                         if dpkg==pfx:
-                                                print(" pkg/%s/%s.a" % (dpkg, dpkg), end="")
+                                                print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
                         else:
-                                print(" pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
         if len(ddeps)>0:
                 print(" |", end="")
                 for ddep in ddeps:
-#                        print(" pkg/%s" % ddep, end="")
-#                        print(" pkg/%s/lib%s.a" % (ddep, ddep), end="")
-                        print(" pkg/%s/%s.o" % (ddep, ddep), end="")
+#                        print(" vade/pkg/%s" % ddep, end="")
+#                        print(" vade/pkg/%s/lib%s.a" % (ddep, ddep), end="")
+                        print(" vade/pkg/%s/%s.o" % (ddep, ddep), end="")
 #                print()
         print()
         return
         if len(ddeps)>0:
-                print("pkg/%s:" % pkg, end="")
+                print("vade/pkg/%s:" % pkg, end="")
                 for ddep in ddeps:
-                        print(" pkg/%s" % ddep, end="")
+                        print(" vade/pkg/%s" % ddep, end="")
                 print()
 
 line = ""

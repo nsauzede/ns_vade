@@ -2,8 +2,10 @@
 [![Build Status][WorkflowBadge]][WorkflowUrl]
 
 TDD-driven, Go-inspired (golang) tool for building/testing C/C++ source code, based on GNU Make, GCC, NASM, Python and Bash.
+This project started as a joke, to see if similar features of the go tool could be applied using only standard tools,
+for simple C/C++ sources, such automatic dependencies for building, test framework, etc..
 
-The Go language uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
+The golang tooling uses a simple, yet effective code methodology (https://golang.org/doc/code.html).
 Vade tries to bring its cool features (easy build, lightweight test, ..) for C (C++) language.
 
 What it's not : a full replacement for Makefiles, especially for complex programs using fancy
@@ -11,14 +13,14 @@ CFLAGS/CXXFLAGS/LDFLAGS.
 It is mainly targetting C; for C++ it might be more appropriate to use other tools, eg: GoogleTest.
 It can also handle assembly files with NASM to produce bare binaries.
 
-It's suitable for simple (yet potentially  interdependent) packages.
-The only caveat is if your packages depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz)
+It's suitable for simple (yet potentially interdependent) packages.
+The only caveat is your packages can't depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz).
 For now these limitations are not addressed.
 
 ## Install
 How to install vade for use:
 1) Clone vade repository somewhere (eg: ~/git/vade)
-2) Add "[ -f ~/git/vade/vade ] && . ~/git/vade/vade" to your ~/.bashrc
+2) Add "[ -f ~/git/vade/bin/vade ] && . ~/git/vade/bin/vade" to your ~/.bashrc
 
 (ofc, replace `~/git/vade` to wherever you cloned vade)
 
@@ -26,9 +28,9 @@ This will both add 'vade' cmd to your path and setup autocompletion.
 
 From now on you can start using vade in your project, which should be organised like this:
 ```
-<project root>/src/<pkg1>/*.{h,c,cpp}
-                  /<pkg2>/*.{h,c,cpp}
-                  /...
+<project root>/vade/src/<pkg1>/*.{h,c,cpp}
+                       /<pkg2>/*.{h,c,cpp}
+                       /...
 ```
 By default it will locate your project's root based on the .git/ location if it's a git repo.
 Otherwise, you can use VADEPATH env var similar to GOPATH.
@@ -54,7 +56,7 @@ $ vade help
 ```
 
 ## Writing unit tests
-Unit tests can be written in a given package, by creating `src/<pkg>/*_test.{c,cpp}` files.
+Unit tests can be written in a given package, by creating `vade/src/<pkg>/*_test.{c,cpp}` files.
 Each such test file can contain several test functions, which should be named like this: `void <pkg>_Test*(void *);`.
 The `void *` argument is an opaque pointer to be provided to the provided `test` package (see vade sources).
 Note that the APIs and messages are heavily inspired from GoogleTest.
@@ -66,8 +68,8 @@ $ cd myproj
 $ git init
 $ vade new a
 $ vade clean test
-    RM  pkg
-    RM  bin
+    RM  vade/pkg
+    RM  vade/bin
     CC  a.o
     AR  a.a
     AR  liba.a
