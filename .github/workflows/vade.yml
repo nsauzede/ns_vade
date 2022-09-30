@@ -16,4 +16,4 @@ jobs:
       - name: Install dependencies
         run: sudo apt install --quiet -y make gcc nasm python3 bash
       - name: Build and test
-        run: ./vade clean test
+        run: bin/vade clean test

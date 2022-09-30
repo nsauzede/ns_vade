@@ -56,7 +56,7 @@ unset vadecalled vadebin vadefull vaderoot vade vadebinpath
 #echo "Fall through to the end of file !"
 else
 
-VADE_VERSION="0.2"
+VADE_VERSION="0.0.3"
 VADEVERSION="version"
 VADEHELP="help"
 VADENEW="new"
@@ -77,7 +77,7 @@ fi
 #exit 0
 
 VADEFULL=$(realpath `readlink ${VADEBIN} || echo ${VADEBIN}`)
-VADEROOT=`dirname ${VADEFULL}`
+VADEROOT=`dirname ${VADEFULL}`/..
 #VADE=`basename ${VADEFULL}`
 VADE=vade
 VADEBINPATH=${VADEROOT}
@@ -88,8 +88,8 @@ VADEBINPATH=${VADEROOT}
 #VADEBINPATH="$vaderoot"
 
 # If VADEPATH is not defined, try to autodetect..
-# 1) try current git root, 2) try ${HOME}/vade
-: ${VADEPATH:=`git rev-parse --show-toplevel 2> /dev/null || echo ${HOME}/vade`}
+# 1) try current git root, 2) try ${HOME}/git/ns_vade
+: ${VADEPATH:=`git rev-parse --show-toplevel 2> /dev/null || echo ${HOME}/git/ns_vade`}
 # Else 3) fallback to vade root itself.
 if [ ! -d "${VADEPATH}" ]; then
     VADEPATH=${VADEROOT}
@@ -148,12 +148,12 @@ ${VADENEW}) :
         echo -e ""
         echo -e "The commands are:"
         echo -e ""
-        echo -e "\t${VADEHELP} [cmd]\tshow help (or cmd help)"
-        echo -e "\t${VADEVERSION}\t\tshow vade version"
-        echo -e "\t${VADENEW}\t\tcreate a new source package"
-        echo -e "\t${VADEBUILD}\t\tcompile packages and dependencies"
-        echo -e "\t${VADECLEAN}\t\tremove object files"
-        echo -e "\t${VADETEST}\t\ttest packages"
+        echo -e "\t${VADEHELP} [cmd]\tShow this help (or cmd help)"
+        echo -e "\t${VADEVERSION}\t\tShow vade version"
+        echo -e "\t${VADENEW}\t\tCreate a new source package"
+        echo -e "\t${VADEBUILD}\t\tBuild packages"
+        echo -e "\t${VADECLEAN}\t\tRemove build files"
+        echo -e "\t${VADETEST}\t\tTest packages"
         echo -e ""
         if [ "x${VADECMD}" = "xhelp" ]; then
             exit 0
@@ -194,7 +194,7 @@ test -d ${VADEPATH} || (echo "can't load package: package .: no buildable source
 
 case ${VADECMD} in
 ${VADENEW}) :
-    mkdir -p ${VADEPATH}/src/${PKG}
+    mkdir -p ${VADEPATH}/vade/src/${PKG}
     {
         echo "#ifndef ${PKG^^}_H__"
         echo "#define ${PKG^^}_H__"
@@ -202,14 +202,14 @@ ${VADENEW}) :
         echo "int ${PKG}_Mock();"
         echo ""
         echo "#endif/*${PKG^^}_H__*/"
-    } > ${VADEPATH}/src/${PKG}/${PKG}.h
+    } > ${VADEPATH}/vade/src/${PKG}/${PKG}.h
     {
         echo '#include "'"${PKG}.h"'"'
         echo ""
         echo "int ${PKG}_Mock() {"
         echo "    return 42;"
         echo "}"
-    } > ${VADEPATH}/src/${PKG}/${PKG}.c
+    } > ${VADEPATH}/vade/src/${PKG}/${PKG}.c
     {
         echo '#include "'"${PKG}.h"'"'
         echo '#include "'"test/test.h"'"'
@@ -218,16 +218,16 @@ ${VADENEW}) :
         echo '    TEST_LOG("Testing '"${PKG}"'..\n");'
         echo "    EXPECT_EQ(42, ${PKG}_Mock());"
         echo "}"
-    } > ${VADEPATH}/src/${PKG}/${PKG}_test.c
+    } > ${VADEPATH}/vade/src/${PKG}/${PKG}_test.c
     ;;
 ${VADEBUILD}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 ${VADECLEAN}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 ${VADETEST}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 *) :
     echo "${VADE}: unknown command \"${VADECMD}\""

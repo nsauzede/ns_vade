@@ -17,23 +17,23 @@
 # support using this Makefile from foreign location
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKE:=make -f $(mkfile_path)
-VADEROOT:=$(shell dirname $(mkfile_path))
-VADEMAKEINTERNAL:=make -f $(VADEROOT)/Makefile_internal SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
+VADEROOT:=$(shell dirname $(mkfile_path))/..
+VADEMAKEINTERNAL:=make -f $(VADEROOT)/vade/Makefile_internal SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
 AR:=ar
 NM:=nm
 NASM:=nasm
 
-#SRCS=$(patsubst src/test,,$(wildcard src/*))
-SRCS=$(wildcard src/*)
-DIRS=$(patsubst src/%,%,$(SRCS))
-PKGS=$(patsubst %,pkg/%,$(DIRS))
-LIBS=$(patsubst src/%,pkg/lib%.a,$(SRCS))
+#SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
+SRCS=$(wildcard vade/src/*)
+DIRS=$(patsubst vade/src/%,%,$(SRCS))
+PKGS=$(patsubst %,vade/pkg/%,$(DIRS))
+LIBS=$(patsubst vade/src/%,vade/pkg/lib%.a,$(SRCS))
 
-TESTS=$(patsubst %,bin/%_test.exe,$(DIRS))
-#RUN_TESTS=$(patsubst %,bin/%_test.exe/RUN,$(DIRS))
-RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*_test.exe))
-#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard bin/*.exe))
+TESTS=$(patsubst %,vade/bin/%_test.exe,$(DIRS))
+#RUN_TESTS=$(patsubst %,vade/bin/%_test.exe/RUN,$(DIRS))
+RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*_test.exe))
+#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*.exe))
 
 _AT_=@
 _AT_1=
@@ -90,69 +90,69 @@ CXXFLAGS+=-DVADE_VERSION=$(VADE_VERSION)
 CFLAGS+=-fPIC
 CXXFLAGS+=-fPIC
 
-CFLAGS+=-Isrc
-CXXFLAGS+=-Isrc
+CFLAGS+=-Ivade/src
+CXXFLAGS+=-Ivade/src
 
-CFLAGS+=-I$(VADEROOT)/src
-CXXFLAGS+=-I$(VADEROOT)/src
+CFLAGS+=-I$(VADEROOT)/vade/src
+CXXFLAGS+=-I$(VADEROOT)/vade/src
 
 .PHONY:all check clean clobber
 
-all: pkg bin $(PKGS)
+all: vade/pkg vade/bin $(PKGS)
 build: all
 test: check
 
-pkg bin:
+vade/pkg vade/bin:
 	$(AT)mkdir $@
 
-DEPSCFILES=$(patsubst src/$(STEM)/%.c,$(STEM)/%,$(wildcard src/$(STEM)/*.c))
-DEPSCPPFILES=$(patsubst src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard src/$(STEM)/*.cpp))
-DEPSASMFILES=$(patsubst src/$(STEM)/%.asm,$(STEM)/%,$(wildcard src/$(STEM)/*.asm))
-pkg/$(STEM)/%.d:
+DEPSCFILES=$(patsubst vade/src/$(STEM)/%.c,$(STEM)/%,$(wildcard vade/src/$(STEM)/*.c))
+DEPSCPPFILES=$(patsubst vade/src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard vade/src/$(STEM)/*.cpp))
+DEPSASMFILES=$(patsubst vade/src/$(STEM)/%.asm,$(STEM)/%,$(wildcard vade/src/$(STEM)/*.asm))
+vade/pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSCFILES=$(DEPSCFILES)"
 #	$(AT)echo "DEPSCPPFILES=$(DEPSCPPFILES)"
 #	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
 	$(AT)for f in $(DEPSCFILES); do \
-		$(CC) -MM -MT "pkg/$$f.o" src/$$f.c $(CFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
+		$(CC) -MM -MT "vade/pkg/$$f.o" vade/src/$$f.c $(CFLAGS) -DTEST_SYMS | $(VADEROOT)/bin/deps.py >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSCPPFILES); do \
-		$(CXX) -MM -MT "pkg/$$f.o" src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS | $(VADEROOT)/deps.py >> $@ || exit 1; \
+		$(CXX) -MM -MT "vade/pkg/$$f.o" vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS | $(VADEROOT)/bin/deps.py >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSASMFILES); do \
-		echo "pkg/$$f.bin: src/$$f.asm" >> $@ || exit 1; \
-		echo "pkg/$(STEM)/lib$(STEM).a: | pkg/$$f.bin" >> $@ || exit 1 ; \
+		echo "vade/pkg/$$f.bin: vade/src/$$f.asm" >> $@ || exit 1; \
+		echo "vade/pkg/$(STEM)/lib$(STEM).a: | vade/pkg/$$f.bin" >> $@ || exit 1 ; \
 	done
-	$(AT)cat $@ >> pkg/vade_dep.d
+	$(AT)cat $@ >> vade/pkg/vade_dep.d
 
-pkg/$(STEM)/%.o: src/$(STEM)/%.c
+vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.c
 	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
 
-pkg/$(STEM)/%.o: src/$(STEM)/%.cpp
+vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.cpp
 	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
 
-pkg/$(STEM)/%.o: $(VADEROOT)/src/test/%.c
+vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c
 	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
 
-pkg/$(STEM)/%.o: $(VADEROOT)/src/test/%.cpp
+vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp
 	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
 
-TESTOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard src/$(STEM)/*_test.c)))
-TESTOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/*_test.cpp)))
+TESTOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard vade/src/$(STEM)/*_test.c)))
+TESTOBJS+=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/*_test.cpp)))
 
-TESTOBJ0=$(patsubst $(VADEROOT)/src/test/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard $(VADEROOT)/src/test/test.c)))
+TESTOBJ0=$(patsubst $(VADEROOT)/vade/src/test/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard $(VADEROOT)/vade/src/test/test.c)))
 
 TESTOBJS+=$(TESTOBJ0)
 
-pkg/test/libtest.a:
+vade/pkg/test/libtest.a:
 #	$(AT)echo "Skipping special libtest.a"
 	true
 
-pkg/test/test.a:
+vade/pkg/test/test.a:
 #	$(AT)echo "Skipping special test.a"
 	true
 
-pkg/test/test.o:
+vade/pkg/test/test.o:
 #	$(AT)echo "Skipping special test.o"
 	true
 
@@ -172,24 +172,24 @@ lib%.a: %.o
 	$(call BRIEF,AR) crsT $@ $^
 
 PROJ=$(patsubst %.a,%,$(@F))
-ALIBOBJS=$(patsubst src/$(PROJ)/%.o,pkg/$(PROJ)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(PROJ)/%_test.c,,$(wildcard src/$(PROJ)/*.c))))
-ALIBOBJS+=$(patsubst src/$(PROJ)/%.o,pkg/$(PROJ)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(PROJ)/%_test.cpp,,$(wildcard src/$(PROJ)/*.cpp))))
+ALIBOBJS=$(patsubst vade/src/$(PROJ)/%.o,vade/pkg/$(PROJ)/%.o,$(patsubst %.c,%.o,$(patsubst vade/src/$(PROJ)/%_test.c,,$(wildcard vade/src/$(PROJ)/*.c))))
+ALIBOBJS+=$(patsubst vade/src/$(PROJ)/%.o,vade/pkg/$(PROJ)/%.o,$(patsubst %.cpp,%.o,$(patsubst vade/src/$(PROJ)/%_test.cpp,,$(wildcard vade/src/$(PROJ)/*.cpp))))
 %.a: %.o
 #	@echo "AUTO LIB tgt=$@ deps=$^ PROJ=$(PROJ)"
-	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
+	$(VADEMAKEINTERNAL) $(SILENTMAKE) vade/pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
-#	$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(PROJ)/$(PROJ).a STEM=$(PROJ) V=$(V)
+#	$(VADEMAKEINTERNAL) $(SILENTMAKE) vade/pkg/$(PROJ)/$(PROJ).a STEM=$(PROJ) V=$(V)
 
-pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
+vade/pkg/$(STEM)/Zlib$(STEM)_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "lib%_test.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(RM) -f $@
 	$(call BRIEF,AR) cr $@ $^
 
-LIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst src/$(STEM)/%_test.c,,$(wildcard src/$(STEM)/*.c))))
-LIBOBJS+=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(patsubst src/$(STEM)/%_test.cpp,,$(wildcard src/$(STEM)/*.cpp))))
+LIBOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst vade/src/$(STEM)/%_test.c,,$(wildcard vade/src/$(STEM)/*.c))))
+LIBOBJS+=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(patsubst vade/src/$(STEM)/%_test.cpp,,$(wildcard vade/src/$(STEM)/*.cpp))))
 
-pkg/$(STEM)/lib%_test.a: pkg/$(STEM)/%_test.a
+vade/pkg/$(STEM)/lib%_test.a: vade/pkg/$(STEM)/%_test.a
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "3LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
@@ -197,7 +197,7 @@ pkg/$(STEM)/lib%_test.a: pkg/$(STEM)/%_test.a
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
-pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
+vade/pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "2LIBOBJS=$(2LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
@@ -205,7 +205,7 @@ pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
-pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
+vade/pkg/$(STEM)/lib%.a: vade/pkg/$(STEM)/%.a
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "0LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
@@ -213,15 +213,15 @@ pkg/$(STEM)/lib%.a: pkg/$(STEM)/%.a
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
-pkg/$(STEM)/%.bin: src/$(STEM)/%.asm
-#	echo "DOING bin/%.bin for STEM=$(STEM)"
+vade/pkg/$(STEM)/%.bin: vade/src/$(STEM)/%.asm
+#	echo "DOING %.bin for STEM=$(STEM)"
 	$(NASM) -o $@ $<
 
-DEPS=$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | $(VADEROOT)/deps.py)
-#DEPS=$(patsubst %.h,%.o,$(patsubst src/%,pkg/%,$(shell test -f pkg/$(STEM)/$(STEM).d && cat pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "test" | grep '.h' | cut -f 3 -d " ")))
-#pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
-#pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
-pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
+DEPS=$(shell test -f vade/pkg/$(STEM)/$(STEM).d && cat vade/pkg/$(STEM)/$(STEM).d | $(VADEROOT)/bin/deps.py)
+#DEPS=$(patsubst %.h,%.o,$(patsubst vade/src/%,vade/pkg/%,$(shell test -f vade/pkg/$(STEM)/$(STEM).d && cat vade/pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "test" | grep '.h' | cut -f 3 -d " ")))
+#vade/pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
+#vade/pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
+vade/pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
@@ -229,62 +229,62 @@ pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
-bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
+vade/bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(call BRIEF,CC) -o $@ $^ -shared -fPIC
 
-LIB=pkg/$(STEM)/lib$(STEM).a
-TESTLIB=pkg/$(STEM)/lib$(STEM)_test.a
+LIB=vade/pkg/$(STEM)/lib$(STEM).a
+TESTLIB=vade/pkg/$(STEM)/lib$(STEM)_test.a
 
-SOLIBOBJS=$(patsubst src/$(STEM)/%.o,pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/export.cpp)))
-SOLIB=$(patsubst src/$(STEM)/%.o,bin/lib$(STEM).so,$(patsubst %.cpp,%.o,$(wildcard src/$(STEM)/export.cpp)))
+SOLIBOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/export.cpp)))
+SOLIB=$(patsubst vade/src/$(STEM)/%.o,vade/bin/lib$(STEM).so,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/export.cpp)))
 TESTLIB+=$(SOLIB)
 
-bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
+vade/bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
 
-TEST_SYMS=$(shell $(NM) pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
-TEST_SYMS+=$(shell $(NM) pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
-#bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
-bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
+TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
+TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
+#vade/bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
+vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 
-bin/%.exe: $(LIB) | $(LIB)
-#	echo "DOING bin/%.exe for STEM=$(STEM)"
+vade/bin/%.exe: $(LIB) | $(LIB)
+#	echo "DOING %.exe for STEM=$(STEM)"
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive
 
 .PHONY:$(PKGS)
 
-pkg/vade_dep.d:
+vade/pkg/vade_dep.d:
 #	@echo "SRCS=$(SRCS)"
 #	@echo "DIRS=$(DIRS)"
 #	@echo "PKGS=$(PKGS)"
 #	@echo "LIBS=$(LIBS)"
 #	@echo "TESTS=$(TESTS)"
 	$(AT)for d in $(DIRS); do \
-		test -d pkg/$$d || mkdir -p pkg/$$d; \
-		$(MAKE) $(SILENTMAKE) pkg/$$d/$$d.d STEM=$$d V=$(V) || exit 1; \
+		test -d vade/pkg/$$d || mkdir -p vade/pkg/$$d; \
+		$(MAKE) $(SILENTMAKE) vade/pkg/$$d/$$d.d STEM=$$d V=$(V) || exit 1; \
 	done
 
-$(PKGS): pkg/vade_dep.d
+$(PKGS): vade/pkg/vade_dep.d
 #	@echo "SRCS=$(SRCS)"
 #	@echo "DIRS=$(DIRS)"
 #	@echo "PKGS=$(PKGS)"
 #	@echo "LIBS=$(LIBS)"
 #	@echo "TESTS=$(TESTS)"
 #	@echo "tgt=$@"
-#	$(AT)echo "pkg/%: how to build $@ ? stem=$* F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+#	$(AT)echo "vade/pkg/%: how to build $@ ? stem=$* F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT0)test -d $(@) || echo "MKDIR $@" && mkdir -p $(@)
 #	$(AT)test -d $(@) || mkdir -p $(@)
-#	$(AT)$(MAKE) $(SILENTMAKE) pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
-#	$(MAKE) $(SILENTMAKE) pkg/$(@F).d STEM=$(@F) V=$(V)
-	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
-	$(AT)test -f pkg/$(@F)/lib$(@F).a && $(NM) pkg/$(@F)/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F).exe STEM=$(@F) V=$(V) || true
-	$(AT)test -z "$(wildcard src/$(@F)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) bin/$(@F)_test.exe STEM=$(@F) V=$(V)
+#	$(AT)$(MAKE) $(SILENTMAKE) vade/pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
+#	$(MAKE) $(SILENTMAKE) vade/pkg/$(@F).d STEM=$(@F) V=$(V)
+	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) vade/pkg/$(@F)/lib$(@F).a STEM=$(@F) V=$(V)
+	$(AT)test -f vade/pkg/$(@F)/lib$(@F).a && $(NM) vade/pkg/$(@F)/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(@F).exe STEM=$(@F) V=$(V) || true
+	$(AT)test -z "$(wildcard vade/src/$(@F)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(@F)_test.exe STEM=$(@F) V=$(V)
 
 .PHONY:$(RUN_TESTS)
 
@@ -298,7 +298,7 @@ check: all
 	$(AT)$(MAKE) $(SILENTMAKE) _check
 
 clean:
-	$(call BRIEF2,RM,pkg) -Rf pkg
+	$(call BRIEF2,RM,vade/pkg) -Rf vade/pkg
 
 clobber: clean
-	$(call BRIEF2,RM,bin) -Rf bin
+	$(call BRIEF2,RM,vade/bin) -Rf vade/bin
