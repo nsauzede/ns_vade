@@ -17,6 +17,8 @@ It's suitable for simple (yet potentially interdependent) packages.
 The only caveat is your packages can't depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz).
 For now these limitations are not addressed.
 
+A nice bonus is that unit-tests run automatically through `valgrind` if available.
+
 ## Install
 How to install vade for use:
 1) Clone vade repository somewhere (eg: ~/git/ns_vade)
@@ -63,29 +65,36 @@ Note that the APIs and messages are heavily inspired from GoogleTest.
 
 Here is the simplest way to create a minimalist test/vade project: (the `git init` convenience is to avoid setting VADEPATH)
 ```
-$ mkdir myproj
-$ cd myproj
+$ mkdir myroot
+$ cd myroot
 $ git init
-$ vade new a
+$ vade new myproj
 $ vade clean test
     RM  vade/pkg
     RM  vade/bin
-    CC  a.o
-    AR  a.a
-    AR  liba.a
-    CC  a_test.o
+    CC  myproj.o
+    AR  myproj.a
+    AR  libmyproj.a
+    CC  myproj_test.o
     CC  test.o
-    AR  a_test.a
-    AR  liba_test.a
-    CXX a_test.exe
-    RUN ./bin/a_test.exe
+    AR  myproj_test.a
+    AR  libmyproj_test.a
+    CXX myproj_test.exe
+    VGRUN       ./vade/bin/myproj_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
-[ RUN      ] a_TestMock_
-[       OK ] a_TestMock_ (0 ms)
+[ RUN      ] myproj_TestMock_
+[       OK ] myproj_TestMock_ (0 ms)
 [----------] Global test environment tear-down
-[==========] 1 tests from test suite ran. (1 ms total)
+[==========] 1 tests from test suite ran. (15 ms total)
 [  PASSED  ] 1 tests.
+```
+
+Note that an arbitrary (set of) package to test can be specified:
+```
+$ vade clean test P+=pkg1 P+=pkg2
+<builds of pkg1 & pkg2 dependencies only>
+<tests of pkg1 & pkg2 only>
 ```
 
 Enjoy !
