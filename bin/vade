@@ -131,7 +131,7 @@ ${VADENEW}) :
         echo "Package name required"
         exit 1
     fi
-    if [ -d ${VADEPATH}/src/${VADESUBCMD} ]; then
+    if [ -d ${VADEPATH}/vade/src/${VADESUBCMD} ]; then
         echo "Package ${VADESUBCMD} already exists (${VADEPATH})"
         exit 1
     fi
