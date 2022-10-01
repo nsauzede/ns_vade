@@ -23,6 +23,12 @@ VADEMAKEINTERNAL:=make -f $(VADEROOT)/vade/Makefile_internal SILENTMAKE=$(SILENT
 AR:=ar
 NM:=nm
 NASM:=nasm
+VALGRIND:=valgrind
+VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
+VGOPTS$(L)+=-q
+VGOPTS+=--leak-check=full
+
+RUNTEST:=$(VALGRIND) $(VGOPTS)
 
 #SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
 SRCS=$(wildcard vade/src/*)
@@ -289,7 +295,7 @@ $(PKGS): vade/pkg/vade_dep.d
 .PHONY:$(RUN_TESTS)
 
 $(RUN_TESTS):
-	$(call BRIEF2,RUN,./$(@D)) ./$(@D) $(TFLAGS) || exit $$?
+	$(call BRIEF2,RUN,./$(@D)) $(RUNTEST) ./$(@D) $(TFLAGS) || exit $$?
 #	$(call BRIEF2,RUN,./$(@F)) ./$(@F)
 
 _check: $(RUN_TESTS)
