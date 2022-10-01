@@ -14,6 +14,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
-        run: sudo apt install --quiet -y make gcc nasm python3 bash
+        run: sudo apt install --quiet -y make gcc nasm python3 bash valgrind
       - name: Build and test
         run: bin/vade clean test
