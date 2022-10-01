@@ -41,7 +41,11 @@ endif
 #SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
 SRCS=$(wildcard vade/src/*)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
+ifeq (,$(P))
 PKGS=$(patsubst %,vade/pkg/%,$(DIRS))
+else
+PKGS=$(patsubst %,vade/pkg/%,$(P))
+endif
 LIBS=$(patsubst vade/src/%,vade/pkg/lib%.a,$(SRCS))
 
 TESTS=$(patsubst %,vade/bin/%_test.exe,$(DIRS))
