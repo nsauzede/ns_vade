@@ -28,7 +28,15 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 
-RUNTEST:=$(VALGRIND) $(VGOPTS)
+ifeq (, $(shell which $(VALGRIND)))
+#$(error "NOT HAVE VALGRIND ($(VALGRIND))")
+RUN:=
+RUNTEST:=RUN
+else
+#$(error "HAVE VALGRIND ($(VALGRIND))")
+VGRUN:=$(VALGRIND) $(VGOPTS)
+RUNTEST:=VGRUN
+endif
 
 #SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
 SRCS=$(wildcard vade/src/*)
@@ -295,8 +303,8 @@ $(PKGS): vade/pkg/vade_dep.d
 .PHONY:$(RUN_TESTS)
 
 $(RUN_TESTS):
-	$(call BRIEF2,RUN,./$(@D)) $(RUNTEST) ./$(@D) $(TFLAGS) || exit $$?
-#	$(call BRIEF2,RUN,./$(@F)) ./$(@F)
+	$(call BRIEF2,$(RUNTEST),./$(@D)) ./$(@D) $(TFLAGS) || exit $$?
+#	$(call BRIEF2,RUNTEST,./$(@F)) ./$(@F)
 
 _check: $(RUN_TESTS)
 
