@@ -98,7 +98,7 @@ extern "C" {
     do { \
         TEST_LOG("  {%s}    Which is: ", name); \
         for (size_t __func__##i = 0; __func__##i < sz; __func__##i++) { \
-            TEST_LOG("%02x", ptr[__func__##i]); \
+            TEST_LOG("%02x", ptr[__func__##i]); fflush(stdout); \
         } \
         TEST_LOG("\n"); \
     } while(0)
@@ -107,12 +107,11 @@ extern "C" {
     do { \
         const unsigned char *__func__##_s1_ = s1; \
         const unsigned char *__func__##_s2_ = s2; \
-        EXPECT_OR(!memcmp(__func__##_s1_, __func__##_s2_, sz), \
-            TEST_LOG("Expected equality of these data:\n", \
-                STRINGIFY_(s1), STRINGIFY_(s2) \
-            ); \
-            DUMP_MEM(STRINGIFY_(s1), __func__##_s1_, sz); \
-            DUMP_MEM(STRINGIFY_(s2), __func__##_s2_, sz); \
+        int __func__##_sz_ = sz; \
+        EXPECT_OR(!memcmp(__func__##_s1_, __func__##_s2_, __func__##_sz_), \
+            TEST_LOG("Expected equality of these data: (%d)\n", __func__##_sz_); \
+            DUMP_MEM(STRINGIFY_(s1), __func__##_s1_, __func__##_sz_); \
+            DUMP_MEM(STRINGIFY_(s2), __func__##_s2_, __func__##_sz_); \
         ); \
     } while(0)
 
