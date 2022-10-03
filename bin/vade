@@ -131,11 +131,15 @@ ${VADENEW}) :
         echo "Package name required"
         exit 1
     fi
-    if [ -d ${VADEPATH}/vade/src/${VADESUBCMD} ]; then
-        echo "Package ${VADESUBCMD} already exists (${VADEPATH})"
+    PKG=${VADESUBCMD}
+    if [ "x${PKG}" == "xtest" ]; then
+        echo "Package name 'test' is reserved"
         exit 1
     fi
-    PKG=${VADESUBCMD}
+    if [ -d ${VADEPATH}/vade/src/${PKG} ]; then
+        echo "Package ${PKG} already exists (VADEPATH=${VADEPATH})"
+        exit 1
+    fi
     ;;
 "" | ${VADEHELP}) :
     case ${VADESUBCMD} in
