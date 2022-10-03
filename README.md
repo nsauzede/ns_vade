@@ -57,6 +57,21 @@ $ vade help
 ...
 ```
 
+## Create a new package
+To create a new package (C by default) in the current vade project root:
+```
+$ vade new coolpkg
+```
+Then one can tinker with `vade/src/coolpkg` sources:
+```
+~/perso/git/ns_vade$ ls -l vade/src/coolpkg
+total 12
+-rw-rw-r-- 1 nsauzede nsauzede  60 oct.   3 11:10 coolpkg.c
+-rw-rw-r-- 1 nsauzede nsauzede  84 oct.   3 11:10 coolpkg.h
+-rw-rw-r-- 1 nsauzede nsauzede 148 oct.   3 11:10 coolpkg_test.c
+```
+Such a freshly created package will be automatically built/tested by a subsequent eg: `vade clean test`
+
 ## Writing unit tests
 Unit tests can be written in a given package, by creating `vade/src/<pkg>/*_test.{c,cpp}` files.
 Each such test file can contain several test functions, which should be named like this: `void <pkg>_Test*(void *);`.
