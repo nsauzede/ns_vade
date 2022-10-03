@@ -121,7 +121,7 @@ build: all
 test: check
 
 vade/pkg vade/bin:
-	$(AT)mkdir $@
+	$(AT)mkdir -p $@
 
 DEPSCFILES=$(patsubst vade/src/$(STEM)/%.c,$(STEM)/%,$(wildcard vade/src/$(STEM)/*.c))
 DEPSCPPFILES=$(patsubst vade/src/$(STEM)/%.cpp,$(STEM)/%,$(wildcard vade/src/$(STEM)/*.cpp))
