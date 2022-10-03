@@ -117,7 +117,7 @@ $ vade clean test
 
 Note that an arbitrary (set of) package to test can be specified:
 ```
-$ vade clean test P+=pkg1 P+=pkg2
+$ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 <builds of pkg1 & pkg2 dependencies only>
 <tests of pkg1 & pkg2 only>
 ```
