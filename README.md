@@ -3,7 +3,13 @@
 
 TDD-driven, Go-inspired (golang) tool for building/testing C/C++ source code, based on GNU Make, GCC, NASM, Python and Bash.
 
-NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed up a new vade project.
+NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed new vade project creation.
+
+## Projects using vade
+- [ ] https://github.com/nsauzede/myem
+- [ ] https://github.com/nsauzede/ns_hash
+- [ ] https://github.com/nsauzede/ns_barebOneS
+- [ ] https://github.com/nsauzede/ns_modc
 
 ## What is it
 This project started as a joke, to see if similar features of the go tool could be applied using only standard tools,
