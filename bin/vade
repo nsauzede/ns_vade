@@ -63,6 +63,7 @@ VADENEW="new"
 VADEBUILD="build"
 VADECLEAN="clean"
 VADETEST="test"
+VADECOV="cov"
 VADECMDS="$VADEHELP $VADECLEAN $VADEBUILD $VADETEST"
 
 VADEBIN=$0
@@ -158,6 +159,7 @@ ${VADENEW}) :
         echo -e "\t${VADEBUILD}\t\tBuild packages"
         echo -e "\t${VADECLEAN}\t\tRemove build files"
         echo -e "\t${VADETEST}\t\tTest packages (default: all, or select a set by defining P)"
+        echo -e "\t${VADECOV}\t\tTest packages and print test coverage (default: all, or select a set by defining P)"
         echo -e ""
         if [ "x${VADECMD}" = "xhelp" ]; then
             exit 0
@@ -177,6 +179,11 @@ ${VADENEW}) :
         ;;
     ${VADECLEAN}) :
         echo "Usage: ${VADE} ${VADESUBCMD} [-i] [-r] [-n] [-x] [build flags] [packages]"
+        echo ""
+        exit 0
+        ;;
+    ${VADETEST}) :
+        echo "Usage: ${VADE} ${VADESUBCMD} [build/test flags] [P+=<pkg1> [P+=<pkg2>] ...]"
         echo ""
         exit 0
         ;;
@@ -231,7 +238,10 @@ ${VADECLEAN}) :
     make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 ${VADETEST}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile check ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile test ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    ;;
+${VADECOV}) :
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile cov ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 *) :
     echo "${VADE}: unknown command \"${VADECMD}\""
