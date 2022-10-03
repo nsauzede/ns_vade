@@ -63,7 +63,8 @@ def dep(line):
                                         print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
                                         ddeps += [dpkg]
                         else:
-                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                if dpkg!="polyglot" and pfx!="polygloth":
+                                        print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
                         if isheader(dfil):
                                 if dep.endswith("vade/src/test/test.h"):
@@ -72,7 +73,11 @@ def dep(line):
                                         if dpkg==pfx:
                                                 print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
                         else:
-                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                #print(" TITI vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                print(" vade/pkg/test.a", end="")
+                                pass
+                                if dpkg!="polyglot" and pfx!="polygloth":
+                                        print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
         if len(ddeps)>0:
                 print(" |", end="")
                 for ddep in ddeps:

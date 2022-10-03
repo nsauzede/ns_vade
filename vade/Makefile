@@ -114,6 +114,12 @@ CXXFLAGS+=-Ivade/src
 CFLAGS+=-I$(VADEROOT)/vade/src
 CXXFLAGS+=-I$(VADEROOT)/vade/src
 
+TCFLAGS:=-include $(VADEROOT)/vade/polyglot/polygloth
+TCXXFLAGS:=-include $(VADEROOT)/vade/polyglot/polygloth
+
+CFLAGS+=$(TCFLAGS)
+CXXFLAGS+=$(TCXXFLAGS)
+
 .PHONY:all check clean clobber
 
 all: vade/pkg vade/bin $(PKGS)
@@ -143,36 +149,53 @@ vade/pkg/$(STEM)/%.d:
 	done
 	$(AT)cat $@ >> vade/pkg/vade_dep.d
 
+#vade/pkg/$(STEM)/%_test.o: CFLAGS=$(TCFLAGS) $(CFLAGS)
+
+#vade/pkg/$(STEM)/%_test.o: vade/src/$(STEM)/%_test.cpp
+#	$(call BRIEF,CXX) -c -o $@ $< $(TCXXFLAGS) $(CXXFLAGS)
+
+#vade/pkg/$(STEM)/%_test.o: vade/src/$(STEM)/%_test.c
+#	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS) $(TCFLAGS)
+
 vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.c
 	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
 
 vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.cpp
 	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
 
-vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c
-	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
+#vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c
+#	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
+vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/polyglot/polyglotc
+	$(call BRIEF,CC) -x c -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
 
-vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp
-	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
+#vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp
+#	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
 
 TESTOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard vade/src/$(STEM)/*_test.c)))
 TESTOBJS+=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/*_test.cpp)))
 
-TESTOBJ0=$(patsubst $(VADEROOT)/vade/src/test/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard $(VADEROOT)/vade/src/test/test.c)))
+#TESTOBJ0=$(patsubst $(VADEROOT)/vade/src/test/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard $(VADEROOT)/vade/src/test/test.c)))
 
 TESTOBJS+=$(TESTOBJ0)
 
 vade/pkg/test/libtest.a:
-#	$(AT)echo "Skipping special libtest.a"
+	$(AT)echo "Skipping special libtest.a"
 	true
 
-vade/pkg/test/test.a:
+vade/pkg/test.o: $(VADEROOT)/vade/polyglot/polyglotc
+	$(call BRIEF,CC) -x c -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
+
+vade/pkg/test.a: vade/pkg/test.o
+	$(RM) -f $@
+	$(call BRIEF,AR) crsT $@ $^
+
+#vade/pkg/test/test.a:
 #	$(AT)echo "Skipping special test.a"
-	true
+#	true
 
-vade/pkg/test/test.o:
+#vade/pkg/test/test.o:
 #	$(AT)echo "Skipping special test.o"
-	true
+#	true
 
 lib%.a: %.a
 #	@echo "AUTO LIB tgt=$@ deps=$^"

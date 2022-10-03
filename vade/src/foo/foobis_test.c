@@ -17,7 +17,10 @@
 */
 
 #include "foo/foo.h"
+
+#ifndef VADE_TEST_INCLUDED
 #include "test/test.h"
+#endif
 
 TEST_F(foo, Foobis) {
 }

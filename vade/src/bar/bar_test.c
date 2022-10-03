@@ -17,7 +17,10 @@
 */
 
 #include "bar/bar.h"
+
+#ifndef VADE_TEST_INCLUDED
 #include "test/test.h"
+#endif
 
 TEST_F(bar, Bar) {
     int foo = 708;

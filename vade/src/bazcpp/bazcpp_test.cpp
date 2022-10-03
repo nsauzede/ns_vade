@@ -17,7 +17,10 @@
 */
 
 #include "bazcpp.h"
+
+#ifndef VADE_TEST_INCLUDED
 #include "test/test.h"
+#endif
 
 TEST_F(bazcpp, BazCPP) {
     TEST_LOG("Testing bazcpp..\n");
