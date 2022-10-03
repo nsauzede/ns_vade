@@ -41,7 +41,27 @@ How to install vade for use:
 
 (ofc, replace `~/git/ns_vade` to wherever you cloned vade)
 
-This will both add 'vade' cmd to your path and setup autocompletion.
+This will both add 'vade' cmd to your path and setup autocompletion:
+```
+$ vade <tab><tab>
+build  clean  help   test
+$ vade help
+Vade is a tool for managing gcc* source code. (*C, C++, assembly, etc..)
+
+Usage:
+
+    vade command [arguments]
+
+The commands are:
+
+    help [cmd]  Show this help (or cmd help)
+    version             Show vade version
+    new         Create a new source package
+    build               Build packages
+    clean               Remove build files
+    test                Test packages (default: all, or select a set by defining P)
+```
+
 
 From now on you can start using vade in your project, which should be organised like this:
 ```
@@ -49,28 +69,10 @@ From now on you can start using vade in your project, which should be organised 
                        /<pkg2>/*.{h,c,cpp}
                        /...
 ```
+But `vade` provides the `new` command to simplify new package creation (see below)
+
 By default it will locate your project's root based on the .git/ location if it's a git repo.
 Otherwise, you can use VADEPATH env var similar to GOPATH.
-
-## Use
-You can now issue :
-$ vade clean build test
-
-Note that vade build and vade test now support smart incremental (re)builds.
-(ie: gcc dependency files are automatically generated and use, so changes to impl or header files trigger recompilation)
-
-Additional parameters after the last command (eg: build) are passed to Makefile (eg: CXXSTD=c++11, V=1, etc..)
-
-Autocompletion :
-```
-$ vade <tab><tab>
-```
-```
-$ vade help
-```
-```
-...
-```
 
 ## Create a new package
 To create a new package (C by default) in the current vade project root:
@@ -85,39 +87,104 @@ total 12
 -rw-rw-r-- 1 nsauzede nsauzede  84 oct.   3 11:10 coolpkg.h
 -rw-rw-r-- 1 nsauzede nsauzede 148 oct.   3 11:10 coolpkg_test.c
 ```
-Such a freshly created package will be automatically built/tested by a subsequent eg: `vade clean test`
+Such a freshly created package will be automatically built/tested (see below)
 
-## Writing unit tests
-Unit tests can be written in a given package, by creating `vade/src/<pkg>/*_test.{c,cpp}` files.
-Each such test file can contain several test functions, which should be named like this: `void <pkg>_Test*(void *);`.
-The `void *` argument is an opaque pointer to be provided to the provided `test` package (see vade sources).
-Note that the APIs and messages are heavily inspired from GoogleTest.
-
-Here is the simplest way to create a minimalist test/vade project: (the `git init` convenience is to avoid setting VADEPATH)
+## Building packages
+In order to build all project's packages and dependencies:
 ```
-$ mkdir myroot
-$ cd myroot
-$ git init
-$ vade new myproj
-$ vade clean test
+$ vade clean build
     RM  vade/pkg
     RM  vade/bin
-    CC  myproj.o
-    AR  myproj.a
-    AR  libmyproj.a
-    CC  myproj_test.o
+    CC  bar.o
+    AR  bar.a
+    CC  foo.o
+    AR  foo.a
+    AR  libbar.a
+    CC  bar_test.o
     CC  test.o
-    AR  myproj_test.a
-    AR  libmyproj_test.a
-    CXX myproj_test.exe
-    VGRUN       ./vade/bin/myproj_test.exe
+    AR  bar_test.a
+    AR  libbar_test.a
+    CXX bar_test.exe
+    CC  baz.o
+    AR  baz.a
+    AR  libbaz.a
+    CXX baz.exe
+    CXX bazcpp.o
+    AR  bazcpp.a
+    AR  libbazcpp.a
+    CXX bazcpp_test.o
+    CC  test.o
+    AR  bazcpp_test.a
+    AR  libbazcpp_test.a
+    CXX bazcpp_test.exe
+    AR  libfoo.a
+    CC  foobis_test.o
+    CC  foo_test.o
+    CXX foocpp_test.o
+    CC  test.o
+    AR  foo_test.a
+    AR  libfoo_test.a
+    CXX foo_test.exe
+```
+
+Not that if one of the packages is a standalone executable tool (ie: it contains the symbol `main`) then
+such an executable is ready to execute in `vade/bin/<pkg.exe>`, eg:
+```
+$ vade/bin/baz.exe 
+Hello baz!
+```
+
+Otherwise, the package is considered to be a library, than can be linked to other project, eg:
+```
+$ file vade/pkg/bar/libbar.a 
+vade/pkg/bar/libbar.a: thin archive with 2 symbol entries
+```
+
+Note that vade build support smart incremental (re)builds.
+(ie: gcc dependency files are automatically generated and use, so changes to impl or header files trigger recompilation)
+
+Additional parameters after the last command (eg: build) are passed to Makefile (eg: CXXSTD=c++11, V=1, etc..)
+
+## Testing packages
+Unit tests can be written in a given package, by creating `vade/src/<pkg>/*_test.{c,cpp}` files.
+Each such test file can contain several test functions, which should be declared like this: `TEST_F(bar, Bar)`.
+Note that the APIs and messages are heavily inspired from GoogleTest, refer to the provided `test` package in vade sources.
+
+Here is the way to test all packages after they've been built:
+```
+$ vade test
+    VGRUN       ./vade/bin/bar_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
-[ RUN      ] myproj_TestMock_
-[       OK ] myproj_TestMock_ (0 ms)
+[ RUN      ] bar_TestBar_
+[       OK ] bar_TestBar_ (0 ms)
 [----------] Global test environment tear-down
-[==========] 1 tests from test suite ran. (15 ms total)
+[==========] 1 tests from test suite ran. (10 ms total)
 [  PASSED  ] 1 tests.
+    VGRUN       ./vade/bin/bazcpp_test.exe
+[==========] Running tests from test suite.
+[----------] Global test environment set-up.
+[ RUN      ] _Z18bazcpp_TestBazCPP_Pv
+[       OK ] _Z18bazcpp_TestBazCPP_Pv (0 ms)
+[----------] Global test environment tear-down
+[==========] 1 tests from test suite ran. (10 ms total)
+[  PASSED  ] 1 tests.
+    VGRUN       ./vade/bin/foo_test.exe
+[==========] Running tests from test suite.
+[----------] Global test environment set-up.
+[ RUN      ] foo_TestFoo_
+[       OK ] foo_TestFoo_ (0 ms)
+[ RUN      ] foo_TestFoo2_
+[       OK ] foo_TestFoo2_ (0 ms)
+[ RUN      ] foo_TestFoobis_
+[       OK ] foo_TestFoobis_ (0 ms)
+[ RUN      ] foo_TestFoobis2_
+[       OK ] foo_TestFoobis2_ (0 ms)
+[ RUN      ] _Z15foo_TestFooCPP_Pv
+[       OK ] _Z15foo_TestFooCPP_Pv (0 ms)
+[----------] Global test environment tear-down
+[==========] 5 tests from test suite ran. (16 ms total)
+[  PASSED  ] 5 tests.
 ```
 
 Note that an arbitrary (set of) package to test can be specified:
