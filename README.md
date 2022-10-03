@@ -1,15 +1,20 @@
-# Vade
+# Vade : Lightweight toolchain on top of standard tools
 [![Build Status][WorkflowBadge]][WorkflowUrl]
 
-TDD-driven, Go-inspired (golang) tool for building/testing C/C++ source code, based on GNU Make, GCC, NASM, Python and Bash.
+Vade is a lightweight toolchain on top of standard tools to make it easier to build and test a project's source packages.
+
+Primarily aimed at the `C language`, it removes the need to write and maintain boring Makefiles or CMakeLists.txt, by automatically generating dependencies.
+
+TDD-driven, Go-inspired (golang), it is based on `GNU Make`, `GCC`, `Python` and `Bash`.
+It also uses `Valgrind` for automatic memleaks detection and `Git` as a convenience to locate the project root, allowing use anywhere below.
 
 NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed new vade project creation.
 
 ## Projects using vade
-- [ ] https://github.com/nsauzede/myem
-- [ ] https://github.com/nsauzede/ns_hash
-- [ ] https://github.com/nsauzede/ns_barebOneS
-- [ ] https://github.com/nsauzede/ns_modc
+- [x] https://github.com/nsauzede/myem
+- [x] https://github.com/nsauzede/ns_hash
+- [x] https://github.com/nsauzede/ns_barebOneS
+- [x] https://github.com/nsauzede/ns_modc
 
 ## What is it
 This project started as a joke, to see if similar features of the go tool could be applied using only standard tools,
