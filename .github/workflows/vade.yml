@@ -16,4 +16,4 @@ jobs:
       - name: Install dependencies
         run: sudo apt install --quiet -y make gcc python3 bash valgrind nasm
       - name: Build and test
-        run: bin/vade clean test
+        run: bin/vade clean cov

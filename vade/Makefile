@@ -24,6 +24,7 @@ AR:=ar
 NM:=nm
 NASM:=nasm
 VALGRIND:=valgrind
+GCOV:=gcov
 VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
@@ -114,11 +115,26 @@ CXXFLAGS+=-Ivade/src
 CFLAGS+=-I$(VADEROOT)/vade/src
 CXXFLAGS+=-I$(VADEROOT)/vade/src
 
+COVFLAGS:=-fprofile-arcs -ftest-coverage
+COVLIBS:=-lgcov --coverage
+CFLAGS+=$(COVFLAGS)
+CXXFLAGS+=$(COVFLAGS)
+
 .PHONY:all check clean clobber
 
 all: vade/pkg vade/bin $(PKGS)
 build: all
 test: check
+cov: test
+	$(AT)echo "=================================="
+	$(AT)echo "Code coverage"
+	$(AT)echo "=================================="
+	$(AT)for d in $(DIRS); do \
+		for c in `ls vade/pkg/$$d/*.gcda 2> /dev/null | grep -v -e "_test.gcda" -e "/test.gcda"`; do \
+			echo -n "$$c: "; \
+			$(GCOV) -n $$c |grep "Lines executed:"|head -n 1|cut -f 2 -d":"; \
+		done; \
+	done
 
 vade/pkg vade/bin:
 	$(AT)mkdir -p $@
@@ -268,12 +284,12 @@ TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_T
 vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 
 vade/bin/%.exe: $(LIB) | $(LIB)
 #	echo "DOING %.exe for STEM=$(STEM)"
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(COVLIBS)
 
 .PHONY:$(PKGS)
 

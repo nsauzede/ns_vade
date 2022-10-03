@@ -194,6 +194,23 @@ $ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 <tests of pkg1 & pkg2 only>
 ```
 
+Also, test coverage can be output as well:
+```
+$ vade cov
+    VGRUN       ./vade/bin/bar_test.exe
+[==========] Running tests from test suite.
+...
+... snip ...
+...
+[  PASSED  ] 5 tests.
+==================================
+Code coverage
+==================================
+vade/pkg/bar/bar.gcda: 100.00% of 3
+vade/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
+vade/pkg/foo/foo.gcda: 100.00% of 2
+```
+
 Enjoy !
 
 [WorkflowBadge]: https://github.com/nsauzede/ns_vade/workflows/vade/badge.svg
