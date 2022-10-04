@@ -88,10 +88,11 @@ endif
 CXXSTD?=11
 #CXXSTD?=17
 
-CSTD?=c11
+#CSTD?=c11
+CSTD?=gnu11
 
 ifdef CSTD
-CFLAGS+=-std=c11
+CFLAGS+=-std=$(CSTD)
 endif
 
 ifdef CXXSTD
