@@ -39,20 +39,28 @@ VGRUN:=$(VALGRIND) $(VGOPTS)
 RUNTEST:=VGRUN
 endif
 
+ifeq (, $(shell which $(GCOV)))
+#$(error "NOT HAVE GCOV ($(GCOV))")
+HAVE_GCOV:=
+else
+#$(error "HAVE GCOV ($(GCOV))")
+HAVE_GCOV:=1
+endif
+
 #SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
 SRCS=$(wildcard vade/src/*)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
-ifeq (,$(P))
-PKGS=$(patsubst %,vade/pkg/%,$(DIRS))
+ifneq (,$(P))
+PKGS:=$(P)
 else
-PKGS=$(patsubst %,vade/pkg/%,$(P))
+PKGS:=$(DIRS)
 endif
+VADE_PKGS=$(patsubst %,vade/pkg/%,$(PKGS))
 LIBS=$(patsubst vade/src/%,vade/pkg/lib%.a,$(SRCS))
 
-TESTS=$(patsubst %,vade/bin/%_test.exe,$(DIRS))
 #RUN_TESTS=$(patsubst %,vade/bin/%_test.exe/RUN,$(DIRS))
-RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*_test.exe))
-#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*.exe))
+#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*_test.exe))
+RUN_TESTS+=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/bin/$(p)_test.exe)))
 
 _AT_=@
 _AT_1=
@@ -121,21 +129,11 @@ COVLIBS:=-lgcov --coverage
 CFLAGS+=$(COVFLAGS)
 CXXFLAGS+=$(COVFLAGS)
 
-.PHONY:all check clean clobber
+.PHONY:all test clean clobber
 
-all: vade/pkg vade/bin $(PKGS)
+all: vade/pkg vade/bin $(VADE_PKGS)
+
 build: all
-test: check
-cov: test
-	$(AT)echo "=================================="
-	$(AT)echo "Code coverage"
-	$(AT)echo "=================================="
-	$(AT)for d in $(DIRS); do \
-		for c in `ls vade/pkg/$$d/*.gcda 2> /dev/null | grep -v -e "_test.gcda" -e "/test.gcda"`; do \
-			echo -n "$$c: "; \
-			$(GCOV) -n $$c |grep "Lines executed:"|head -n 1|cut -f 2 -d":"; \
-		done; \
-	done
 
 vade/pkg vade/bin:
 	$(AT)mkdir -p $@
@@ -161,15 +159,19 @@ vade/pkg/$(STEM)/%.d:
 	$(AT)cat $@ >> vade/pkg/vade_dep.d
 
 vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.c
+	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
 	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS)
 
 vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.cpp
+	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
 	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
 
 vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c
+	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
 	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
 
 vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp
+	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
 	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
 
 TESTOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard vade/src/$(STEM)/*_test.c)))
@@ -292,25 +294,23 @@ vade/bin/%.exe: $(LIB) | $(LIB)
 #	echo "DOING %.exe for STEM=$(STEM)"
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(COVLIBS)
 
-.PHONY:$(PKGS)
+.PHONY:$(VADE_PKGS)
 
 vade/pkg/vade_dep.d:
 #	@echo "SRCS=$(SRCS)"
 #	@echo "DIRS=$(DIRS)"
-#	@echo "PKGS=$(PKGS)"
+#	@echo "VADE_PKGS=$(VADE_PKGS)"
 #	@echo "LIBS=$(LIBS)"
-#	@echo "TESTS=$(TESTS)"
 	$(AT)for d in $(DIRS); do \
 		test -d vade/pkg/$$d || mkdir -p vade/pkg/$$d; \
 		$(MAKE) $(SILENTMAKE) vade/pkg/$$d/$$d.d STEM=$$d V=$(V) || exit 1; \
 	done
 
-$(PKGS): vade/pkg/vade_dep.d
+$(VADE_PKGS): vade/pkg/vade_dep.d
 #	@echo "SRCS=$(SRCS)"
 #	@echo "DIRS=$(DIRS)"
-#	@echo "PKGS=$(PKGS)"
+#	@echo "VADE_PKGS=$(VADE_PKGS)"
 #	@echo "LIBS=$(LIBS)"
-#	@echo "TESTS=$(TESTS)"
 #	@echo "tgt=$@"
 #	$(AT)echo "vade/pkg/%: how to build $@ ? stem=$* F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 #	$(AT0)test -d $(@) || echo "MKDIR $@" && mkdir -p $(@)
@@ -327,10 +327,21 @@ $(RUN_TESTS):
 	$(call BRIEF2,$(RUNTEST),./$(@D)) ./$(@D) $(TFLAGS) || exit $$?
 #	$(call BRIEF2,RUNTEST,./$(@F)) ./$(@F)
 
-_check: $(RUN_TESTS)
+_test: $(RUN_TESTS)
 
-check: all
-	$(AT)$(MAKE) $(SILENTMAKE) _check
+test: all
+	$(AT)$(MAKE) $(SILENTMAKE) _test
+ifdef HAVE_GCOV
+	$(AT)echo "=================================="
+	$(AT)echo "Code coverage"
+	$(AT)echo "=================================="
+	$(AT)for d in $(PKGS); do \
+		for c in `ls vade/pkg/$$d/*.gcda 2> /dev/null | grep -v -e "_test.gcda" -e "/test.gcda"`; do \
+			echo -n "$$c: "; \
+			$(GCOV) -n $$c |grep "Lines executed:"|head -n 1|cut -f 2 -d":"; \
+		done; \
+	done
+endif
 
 clean:
 	$(call BRIEF2,RM,vade/pkg) -Rf vade/pkg

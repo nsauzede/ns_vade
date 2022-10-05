@@ -18,53 +18,17 @@
 
 vadecalled=$_
 #echo "Testing if script is being sourced.."
-if [ $vadecalled != $0 ]; then
-#echo "Script is being sourced"
-#echo "\$BASH_SOURCE ${BASH_SOURCE[@]}"
+if [ $vadecalled == $0 ]; then
 
-#echo "_=$vadecalled 0=$0"
+VADE_VERSION="0.0.4"
 
-vadebin=${BASH_SOURCE}
-vadefull=$(realpath `readlink ${vadebin} || echo ${vadebin}`)
-vaderoot=`dirname ${vadefull}`
-#vade=`basename ${vadefull}`
-vade=vade
-vadebinpath=${vaderoot}
-
-# add vade program path to PATH
-#echo "Checking if ${vadebinpath} is in PATH.."
-if [ -d "${vadebinpath}" ] && [[ ":$PATH:" != *":${vadebinpath}:"* ]]; then
-#    echo "Adding ${vadebinpath} to PATH"
-    PATH="${PATH:+"$PATH:"}${vadebinpath}"
-fi
-
-# add vade autocompletion
-#echo "Setting up '${vade}' autocompletion"
-_vade()
-{
-    local cur opts
-    COMPREPLY=()
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    opts=$(vade complete)
-    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
-    return 0
-}
-complete -o nospace -F _vade ${vade}
-
-unset vadecalled vadebin vadefull vaderoot vade vadebinpath
-
-#echo "Fall through to the end of file !"
-else
-
-VADE_VERSION="0.0.3"
-VADEVERSION="version"
+VADEBUILD="build"
+VADECLEAN="clean"
 VADEHELP="help"
 VADENEW="new"
-VADECLEAN="clean"
-VADEBUILD="build"
 VADETEST="test"
-VADECOV="cov"
-VADECMDS="$VADEHELP $VADENEW $VADECLEAN $VADEBUILD $VADETEST $VADECOV"
+VADEVERSION="version"
+VADECMDS="$VADEBUILD $VADECLEAN $VADEHELP $VADENEW $VADETEST $VADEVERSION"
 
 VADEBIN=$0
 VADECMD=$1
@@ -159,7 +123,6 @@ ${VADENEW}) :
         echo -e "\t${VADEBUILD}\t\tBuild packages"
         echo -e "\t${VADECLEAN}\t\tRemove build files"
         echo -e "\t${VADETEST}\t\tTest packages (default: all, or select a set by defining P)"
-        echo -e "\t${VADECOV}\t\tTest packages and print test coverage (default: all, or select a set by defining P)"
         echo -e ""
         if [ "x${VADECMD}" = "xhelp" ]; then
             exit 0
@@ -223,6 +186,7 @@ ${VADENEW}) :
     } > ${VADEPATH}/vade/src/${PKG}/${PKG}.c
     {
         echo '#include "'"${PKG}.h"'"'
+        echo ""
         echo '#include "'"test/test.h"'"'
         echo ""
         echo "TEST_F(${PKG}, Mock) {"
@@ -240,9 +204,6 @@ ${VADECLEAN}) :
 ${VADETEST}) :
     make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile test ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
-${VADECOV}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile cov ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
-    ;;
 *) :
     echo "${VADE}: unknown command \"${VADECMD}\""
     echo "Run '${VADE} help' for usage."
@@ -250,6 +211,43 @@ ${VADECOV}) :
     exit 2
     ;;
 esac
+
+#echo "Fall through to the end of file !"
+else
+
+#echo "Script is being sourced"
+#echo "\$BASH_SOURCE ${BASH_SOURCE[@]}"
+
+#echo "_=$vadecalled 0=$0"
+
+vadebin=${BASH_SOURCE}
+vadefull=$(realpath `readlink ${vadebin} || echo ${vadebin}`)
+vaderoot=`dirname ${vadefull}`
+#vade=`basename ${vadefull}`
+vade=vade
+vadebinpath=${vaderoot}
+
+# add vade program path to PATH
+#echo "Checking if ${vadebinpath} is in PATH.."
+if [ -d "${vadebinpath}" ] && [[ ":$PATH:" != *":${vadebinpath}:"* ]]; then
+#    echo "Adding ${vadebinpath} to PATH"
+    PATH="${PATH:+"$PATH:"}${vadebinpath}"
+fi
+
+# add vade autocompletion
+#echo "Setting up '${vade}' autocompletion"
+_vade()
+{
+    local cur opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    opts=$(vade complete)
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+    return 0
+}
+complete -o nospace -F _vade ${vade}
+
+unset vadecalled vadebin vadefull vaderoot vade vadebinpath
 
 fi
 #echo "The end, good bye!"
