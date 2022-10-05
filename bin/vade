@@ -51,6 +51,7 @@ VADEBINPATH=${VADEROOT}
 #VADEROOT="$vaderoot"
 #VADE="$vade"
 #VADEBINPATH="$vaderoot"
+VADEMAKEFILE=${VADEROOT}/Makefile
 
 # If VADEPATH is not defined, try to autodetect..
 # 1) try current git root, 2) try ${HOME}/git/ns_vade
@@ -196,13 +197,13 @@ ${VADENEW}) :
     } > ${VADEPATH}/vade/src/${PKG}/${PKG}_test.c
     ;;
 ${VADEBUILD}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEMAKEFILE} all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 ${VADECLEAN}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEMAKEFILE} clobber ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 ${VADETEST}) :
-    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEROOT}/vade/Makefile test ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
+    make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEMAKEFILE} test ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
     ;;
 *) :
     echo "${VADE}: unknown command \"${VADECMD}\""
