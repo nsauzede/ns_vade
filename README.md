@@ -5,8 +5,9 @@ Vade is a lightweight toolchain on top of standard tools to make it easier to bu
 
 Primarily aimed at the `C language`, it removes the need to write and maintain boring Makefiles or CMakeLists.txt, by automatically generating dependencies.
 
-TDD-driven, Go-inspired (golang), it is based on `GNU Make`, `GCC`, `Python` and `Bash`.
-It also uses `Valgrind` for automatic memleaks detection and `Git` as a convenience to locate the project root, allowing use anywhere below.
+TDD-driven, Go-inspired (golang), it is based on `GNU Make`, `Gcc`, `Python` and `Bash`.
+It uses `Git` as a convenience to locate the project root, allowing use anywhere below.
+Also, if `Valgrind` and/or `Gcov` are available, they're used for automatic memleaks detection and test coverage report.
 
 NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed new vade project creation.
 
@@ -31,8 +32,6 @@ It can also handle assembly files with NASM to produce bare binaries.
 It's suitable for simple (yet potentially interdependent) packages.
 The only caveat is your packages can't depend on external libraries (eg: libz, which would need manual LDLIBS+=-lz).
 For now these limitations are not addressed.
-
-A nice bonus is that unit-tests run automatically through `valgrind` if available.
 
 ## Install
 How to install vade for use:
@@ -185,6 +184,12 @@ $ vade test
 [----------] Global test environment tear-down
 [==========] 5 tests from test suite ran. (16 ms total)
 [  PASSED  ] 5 tests.
+==================================
+Code coverage
+==================================
+vade/pkg/bar/bar.gcda: 100.00% of 3
+vade/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
+vade/pkg/foo/foo.gcda: 100.00% of 2
 ```
 
 Note that an arbitrary (set of) package to test can be specified:
@@ -192,23 +197,6 @@ Note that an arbitrary (set of) package to test can be specified:
 $ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 <builds of pkg1 & pkg2 dependencies only>
 <tests of pkg1 & pkg2 only>
-```
-
-Also, test coverage can be output as well:
-```
-$ vade cov
-    VGRUN       ./vade/bin/bar_test.exe
-[==========] Running tests from test suite.
-...
-... snip ...
-...
-[  PASSED  ] 5 tests.
-==================================
-Code coverage
-==================================
-vade/pkg/bar/bar.gcda: 100.00% of 3
-vade/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
-vade/pkg/foo/foo.gcda: 100.00% of 2
 ```
 
 Enjoy !
