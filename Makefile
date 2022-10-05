@@ -17,8 +17,8 @@
 # support using this Makefile from foreign location
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 MAKE:=make -f $(mkfile_path)
-VADEROOT:=$(shell dirname $(mkfile_path))/..
-VADEMAKEINTERNAL:=make -f $(VADEROOT)/vade/Makefile_internal SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
+VADEROOT:=$(shell dirname $(mkfile_path))
+VADEMAKEINTERNAL:=make -f $(VADEROOT)/internal.mk SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
 AR:=ar
 NM:=nm
