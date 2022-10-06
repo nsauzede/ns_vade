@@ -49,7 +49,7 @@ extern "C" {
 
 #define EXPECT_OR(bool_expr, ...) \
     do { \
-        int __func__##_bool_expr_ = bool_expr; \
+        int __func__##_bool_expr_ = !!(bool_expr); \
         int __func__##_expected_ = 1; \
         int failed = 0; \
         if (__func__##_bool_expr_ != __func__##_expected_) { \
