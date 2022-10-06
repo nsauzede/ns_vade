@@ -43,7 +43,7 @@ extern "C" {
 #define NRM() "\x1b[0m"
 
 /* declare a package test function */
-#define TEST_F(package, test) void package##_Test##test##_(void *test_opaque_)
+#define TEST_F(package, test) void package##_Test_##test##_(void *test_opaque_)
 
 #define TEST_LOG(...) test_Logf(test_opaque_, __VA_ARGS__)
 

@@ -281,8 +281,8 @@ vade/bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
 
-TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test | cut -f 3 -d ' ')
-TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test | cut -f 3 -d ' ')
+TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ $(STEM)_Test_ | cut -f 3 -d ' ')
+TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(STEM)_Test_ | cut -f 3 -d ' ')
 #vade/bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
