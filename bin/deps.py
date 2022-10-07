@@ -17,12 +17,16 @@ def isheader(fil):
 def dep(line):
         print("%s" % line)
         ls=line.split(".o: ")
-#        print("ls=%s" % ls)
-        rule=ls[0].split("/")
-        if len(rule) < 4:
-                return
-        pkg=rule[2]
-        tgt=rule[3]
+        #print(f"# ls={ls}")
+        dirname=os.path.dirname(ls[0])
+        #print(f"# dirname={dirname}")
+        pkg=dirname.split('vade/pkg/')[1]
+        tgt=os.path.basename(ls[0])
+#        if len(rule) < 4:
+#                return
+#        pkg=rule[2]
+#        tgt=rule[3]
+        #print(f"# pkg={pkg} tgt={tgt}")
         if len(ls) < 2:
                 return
         deps=ls[1]
@@ -33,11 +37,13 @@ def dep(line):
         print("vade/pkg/%s/%s.a: vade/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
 #        print("vade/pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
-                dls = dep.split("/")
-                ddir = dls[-3]
-                dpkg = dls[-2]
-                dfil = dls[-1]
+                #print(f"# dep={dep} \\")
+                dirname=os.path.dirname(dep)
+                #print(f"# dirname={dirname} \\")
+                dpkg = dirname.split("vade/src/")[1]
+                dfil = os.path.basename(dep)
                 pfx = dfil.split('.')[0]
+                #print(f"# dpkg={dpkg} dfil={dfil} pfx={pfx} \\")
                 if dpkg != pkg:
                         continue
                 if not tgt.endswith("_test"):
@@ -52,15 +58,19 @@ def dep(line):
         ddeps=[]
         print("vade/pkg/%s/lib%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
+                #print(f"# ZORG dep={dep} \\")
+                dirname=os.path.dirname(dep)
+                #print(f"# ZORG dirname={dirname} \\")
                 dls = dep.split("/")
                 ddir = dls[-3]
-                dpkg = dls[-2]
-                dfil = dls[-1]
+                dpkg = dirname.split("vade/src/")[1]
+                dfil = os.path.basename(dep)
                 pfx = dfil.split('.')[0]
+                #print(f"# ZIRG dpkg={dpkg} dfil={dfil} pfx={pfx}")
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
                                 if dpkg!=pkg:
-                                        print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
+                                        print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
                                         ddeps += [dpkg]
                         else:
                                 print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
@@ -69,8 +79,8 @@ def dep(line):
                                 if dep.endswith("vade/src/test/test.h"):
                                         print(" vade/pkg/%s/test.o" % pkg)
                                 else:
-                                        if dpkg==pfx:
-                                                print(" vade/pkg/%s/%s.a" % (dpkg, dpkg), end="")
+                                        if os.path.basename(dpkg)==pfx:
+                                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
                         else:
                                 print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
         if len(ddeps)>0:
