@@ -20,7 +20,7 @@ vadecalled=$_
 #echo "Testing if script is being sourced.."
 if [ $vadecalled == $0 ]; then
 
-VADE_VERSION="0.0.4"
+VADE_VERSION="0.0.5"
 
 VADEBUILD="build"
 VADECLEAN="clean"
@@ -98,6 +98,8 @@ ${VADENEW}) :
         exit 1
     fi
     PKG=${VADESUBCMD}
+    PKGNAME=${PKG////_}
+    PKGBASE=`basename ${PKG}`
     if [ "x${PKG}" == "xtest" ]; then
         echo "Package name 'test' is reserved"
         exit 1
@@ -167,34 +169,42 @@ esac
 
 test -d ${VADEPATH} || (echo "can't load package: package .: no buildable source files in ${VADEPATH}" ; exit 1)
 
+#echo "PKG=${PKG}"
+#echo "PKGNAME=${PKGNAME}"
+#echo "PKGBASE=${PKGBASE}"
+
 case ${VADECMD} in
 ${VADENEW}) :
+#    echo "MKDIR.."
     mkdir -p ${VADEPATH}/vade/src/${PKG}
+#    echo "ECHO .h.."
     {
-        echo "#ifndef ${PKG^^}_H__"
-        echo "#define ${PKG^^}_H__"
+        echo "#ifndef ${PKGNAME^^}_H__"
+        echo "#define ${PKGNAME^^}_H__"
         echo ""
-        echo "int ${PKG}_Mock();"
+        echo "int ${PKGNAME}_Mock();"
         echo ""
-        echo "#endif/*${PKG^^}_H__*/"
-    } > ${VADEPATH}/vade/src/${PKG}/${PKG}.h
+        echo "#endif/*${PKGNAME^^}_H__*/"
+    } > ${VADEPATH}/vade/src/${PKG}/${PKGBASE}.h
+#    echo "ECHO .c.."
     {
-        echo '#include "'"${PKG}.h"'"'
+        echo '#include "'"${PKGBASE}.h"'"'
         echo ""
-        echo "int ${PKG}_Mock() {"
+        echo "int ${PKGNAME}_Mock() {"
         echo "    return 42;"
         echo "}"
-    } > ${VADEPATH}/vade/src/${PKG}/${PKG}.c
+    } > ${VADEPATH}/vade/src/${PKG}/${PKGBASE}.c
+#    echo "ECHO _test.c.."
     {
-        echo '#include "'"${PKG}.h"'"'
+        echo '#include "'"${PKGBASE}.h"'"'
         echo ""
         echo '#include "'"test/test.h"'"'
         echo ""
-        echo "TEST_F(${PKG}, Mock) {"
-        echo '    TEST_LOG("Testing '"${PKG}"' Mock..\n");'
-        echo "    EXPECT_EQ(42, ${PKG}_Mock());"
+        echo "TEST_F(${PKGNAME}, Mock) {"
+        echo '    TEST_LOG("Testing '"${PKGNAME}"' Mock..\n");'
+        echo "    EXPECT_EQ(42, ${PKGNAME}_Mock());"
         echo "}"
-    } > ${VADEPATH}/vade/src/${PKG}/${PKG}_test.c
+    } > ${VADEPATH}/vade/src/${PKG}/${PKGBASE}_test.c
     ;;
 ${VADEBUILD}) :
     make ${SILENCEMAKE} -C ${VADEPATH} -f ${VADEMAKEFILE} all ${VADEARGS} VADE_VERSION="${VADE_VERSION}"
