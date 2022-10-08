@@ -47,20 +47,13 @@ else
 HAVE_GCOV:=1
 endif
 
-#SRCS=$(patsubst vade/src/test,,$(wildcard vade/src/*))
-#SRCS=$(wildcard vade/src/*)
 SRCS=$(shell find vade/src -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
-#$(error SRCS=$(SRCS) DIRS=$(DIRS))
-ifneq (,$(P))
-PKGS:=$(P)
-else
-PKGS:=$(DIRS)
-endif
+PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
+PKGS=$(patsubst vade/src/%,%,$(PSRCS))
+
 VADE_PKGS=$(patsubst %,vade/pkg/%,$(PKGS))
 
-#RUN_TESTS=$(patsubst %,vade/bin/%_test.exe/RUN,$(DIRS))
-#RUN_TESTS+=$(patsubst %,%/RUN,$(wildcard vade/bin/*_test.exe))
 RUN_TESTS+=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/bin/$(p)/$(shell basename $(p))_test.exe)))
 
 _AT_=@

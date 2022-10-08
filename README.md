@@ -76,15 +76,12 @@ Otherwise, you can use VADEPATH env var similar to GOPATH.
 ## Create a new package
 To create a new package (C by default) in the current vade project root:
 ```
-$ vade new coolpkg
+$ vade new cool/pkg
 ```
-Then one can tinker with `vade/src/coolpkg` sources:
+Then one can tinker with `vade/src/cool/pkg` sources:
 ```
-~/perso/git/ns_vade$ ls -l vade/src/coolpkg
-total 12
--rw-rw-r-- 1 nsauzede nsauzede  60 oct.   3 11:10 coolpkg.c
--rw-rw-r-- 1 nsauzede nsauzede  84 oct.   3 11:10 coolpkg.h
--rw-rw-r-- 1 nsauzede nsauzede 148 oct.   3 11:10 coolpkg_test.c
+$ ls vade/src/cool/pkg
+pkg.c  pkg.h  pkg_test.c
 ```
 Such a freshly created package will be automatically built/tested (see below)
 
@@ -127,15 +124,15 @@ $ vade clean build
 ```
 
 Not that if one of the packages is a standalone executable tool (ie: it contains the symbol `main`) then
-such an executable is ready to execute in `vade/bin/<pkg.exe>`, eg:
+such an executable is ready to execute in `vade/bin/<pkg>/<pkg.exe>`, eg:
 ```
-$ vade/bin/baz.exe 
+$ vade/bin/baz/baz.exe
 Hello baz!
 ```
 
 Otherwise, the package is considered to be a library, than can be linked to other project, eg:
 ```
-$ file vade/pkg/bar/libbar.a 
+$ file vade/pkg/bar/libbar.a
 vade/pkg/bar/libbar.a: thin archive with 2 symbol entries
 ```
 
@@ -152,52 +149,53 @@ Note that the APIs and messages are heavily inspired from GoogleTest, refer to t
 Here is the way to test all packages after they've been built:
 ```
 $ vade test
-    VGRUN       ./vade/bin/bar_test.exe
+    VGRUN       ./vade/bin/bazcpp/bazcpp_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
-[ RUN      ] bar_TestBar_
-[       OK ] bar_TestBar_ (0 ms)
+[ RUN      ] _Z19bazcpp_Test_BazCPP_Pv
+[       OK ] _Z19bazcpp_Test_BazCPP_Pv (0 ms)
 [----------] Global test environment tear-down
-[==========] 1 tests from test suite ran. (10 ms total)
+[==========] 1 tests from test suite ran. (24 ms total)
 [  PASSED  ] 1 tests.
-    VGRUN       ./vade/bin/bazcpp_test.exe
+    VGRUN       ./vade/bin/foo/foo_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
-[ RUN      ] _Z18bazcpp_TestBazCPP_Pv
-[       OK ] _Z18bazcpp_TestBazCPP_Pv (0 ms)
+[ RUN      ] foo_Test_Foo_
+[       OK ] foo_Test_Foo_ (0 ms)
+[ RUN      ] foo_Test_Foo2_
+[       OK ] foo_Test_Foo2_ (0 ms)
+[ RUN      ] foo_Test_Foobis_
+[       OK ] foo_Test_Foobis_ (0 ms)
+[ RUN      ] foo_Test_Foobis2_
+[       OK ] foo_Test_Foobis2_ (0 ms)
+[ RUN      ] _Z16foo_Test_FooCPP_Pv
+[       OK ] _Z16foo_Test_FooCPP_Pv (0 ms)
 [----------] Global test environment tear-down
-[==========] 1 tests from test suite ran. (10 ms total)
-[  PASSED  ] 1 tests.
-    VGRUN       ./vade/bin/foo_test.exe
-[==========] Running tests from test suite.
-[----------] Global test environment set-up.
-[ RUN      ] foo_TestFoo_
-[       OK ] foo_TestFoo_ (0 ms)
-[ RUN      ] foo_TestFoo2_
-[       OK ] foo_TestFoo2_ (0 ms)
-[ RUN      ] foo_TestFoobis_
-[       OK ] foo_TestFoobis_ (0 ms)
-[ RUN      ] foo_TestFoobis2_
-[       OK ] foo_TestFoobis2_ (0 ms)
-[ RUN      ] _Z15foo_TestFooCPP_Pv
-[       OK ] _Z15foo_TestFooCPP_Pv (0 ms)
-[----------] Global test environment tear-down
-[==========] 5 tests from test suite ran. (16 ms total)
+[==========] 5 tests from test suite ran. (32 ms total)
 [  PASSED  ] 5 tests.
+    VGRUN       ./vade/bin/bar/bar_test.exe
+[==========] Running tests from test suite.
+[----------] Global test environment set-up.
+[ RUN      ] bar_Test_Bar_
+[       OK ] bar_Test_Bar_ (0 ms)
+[----------] Global test environment tear-down
+[==========] 1 tests from test suite ran. (19 ms total)
+[  PASSED  ] 1 tests.
 ==================================
-Code coverage
+Code coverage (3 tests)
 ==================================
-vade/pkg/bar/bar.gcda: 100.00% of 3
 vade/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
 vade/pkg/foo/foo.gcda: 100.00% of 2
+vade/pkg/bar/bar.gcda: 100.00% of 3
 ```
 
-Note that an arbitrary (set of) package to test can be specified:
+Note that an arbitrary (set of) package to build/test can be specified:
 ```
 $ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 <builds of pkg1 & pkg2 dependencies only>
 <tests of pkg1 & pkg2 only>
 ```
+If there are many subpackages in a given parent folder, then `P` can be set to the parent folder, to specify all subpackages.
 
 Enjoy !
 
