@@ -143,6 +143,9 @@ vade/pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
 	$(AT)for f in $(DEPSCFILES); do \
+		$(CC) -M -MG vade/src/$$f.c $(CFLAGS) -DTEST_SYMS > $(@).m || exit 1; \
+	done
+	$(AT)for f in $(DEPSCFILES); do \
 		$(CC) -MM -MT "vade/pkg/$$f.o" vade/src/$$f.c $(CFLAGS) -DTEST_SYMS | tee $(@).deps | $(VADEROOT)/bin/deps.py >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSCPPFILES); do \
