@@ -29,7 +29,7 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 
-ifeq (, $(shell which $(VALGRIND)))
+ifeq (, $(shell which $(VALGRIND) 2>/dev/null))
 #$(error "NOT HAVE VALGRIND ($(VALGRIND))")
 RUN:=
 RUNTEST:=RUN
@@ -39,7 +39,7 @@ VGRUN:=$(VALGRIND) $(VGOPTS)
 RUNTEST:=VGRUN
 endif
 
-ifeq (, $(shell which $(GCOV)))
+ifeq (, $(shell which $(GCOV) 2>/dev/null))
 #$(error "NOT HAVE GCOV ($(GCOV))")
 HAVE_GCOV:=
 else
