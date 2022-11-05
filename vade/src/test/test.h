@@ -53,7 +53,7 @@ extern "C" {
         int __func__##_expected_ = 1; \
         int failed = 0; \
         if (__func__##_bool_expr_ != __func__##_expected_) { \
-            printf("%s:%d: %sFailure%s\n", __FILE__, __LINE__, RED(), NRM()); \
+            printf("%s:%d: Failure\n", __FILE__, __LINE__); \
             test_Fail(test_opaque_); \
             failed = 1; \
         } else { \

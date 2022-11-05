@@ -104,7 +104,12 @@ int main(int argc, char *argv[]) {
                 if (is_fail) {
                     failed++;
                 }
-                printf("[ %s ] %s (%ld ms)\n", is_fail ? " FAILED " : "      OK", buf, ms);
+                printf("[ %s ] %s%s%s (%ld ms)\n",
+                    is_fail ? RED() " FAILED " NRM() : "      OK",
+                    is_fail ? RED() : "",
+                    buf,
+                    is_fail ? NRM() : "",
+                    ms);
                 if (failed > 0) break;
             } else {
                 printf("error: %s\n", dlerror());
