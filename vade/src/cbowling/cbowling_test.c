@@ -1,0 +1,50 @@
+#include "cbowling.h"
+#include "test/test.h"
+
+Game g;
+static void setUp() {
+    game_init(&g);
+}
+static void rollMany(int n, int pins) {
+    for (int i = 0; i < n; i++) {
+        game_roll(&g, pins);
+    }
+}
+static void rollSpare() {
+    game_roll(&g, 5);
+    game_roll(&g, 5);
+}
+static void rollStrike() {
+    game_roll(&g, 10);
+}
+
+TEST_F(cbowling, gutterGame) {
+    setUp();
+    rollMany(20, 0);
+    EXPECT_EQ(0, game_score(&g));
+}
+TEST_F(cbowling, allOnes) {
+    setUp();
+    rollMany(20, 1);
+    EXPECT_EQ(20, game_score(&g));
+}
+TEST_F(cbowling, oneSpare) {
+    setUp();
+    rollSpare();
+    game_roll(&g, 3);
+    rollMany(17, 0);
+    EXPECT_EQ(16, game_score(&g));
+}
+TEST_F(cbowling, oneStrike) {
+    setUp();
+    rollStrike();
+    game_roll(&g, 3);
+    game_roll(&g, 4);
+    rollMany(16, 0);
+    EXPECT_EQ(24, game_score(&g));
+}
+TEST_F(cbowling, perfectGame) {
+    setUp();
+    rollMany(12, 10);
+    EXPECT_EQ(300, game_score(&g));
+}
