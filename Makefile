@@ -38,6 +38,7 @@ else
 VGRUN:=$(VALGRIND) $(VGOPTS)
 RUNTEST:=VGRUN
 endif
+RUNPYTEST:=RUNPY
 
 ifeq (, $(shell which $(GCOV) 2>/dev/null))
 #$(error "NOT HAVE GCOV ($(GCOV))")
@@ -54,7 +55,8 @@ PKGS=$(patsubst vade/src/%,%,$(PSRCS))
 
 VADE_PKGS=$(patsubst %,vade/pkg/%,$(PKGS))
 
-RUN_TESTS+=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/bin/$(p)/$(shell basename $(p))_test.exe)))
+RUN_TESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/bin/$(p)/$(shell basename $(p))_test.exe)))
+RUN_PYTESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUNPY,$(wildcard vade/src/$(p)/$(shell basename $(p))_test.py)))
 
 _AT_=@
 _AT_1=
@@ -272,7 +274,7 @@ TESTLIB=vade/pkg/$(STEM)/lib$(shell basename $(STEM) 2> /dev/null)_test.a
 vade/bin/$(STEM)/lib$(STEM).so: vade/pkg/$(STEM)/lib$(STEM).a | vade/pkg/$(STEM)/lib$(STEM).a
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(AT)mkdir -p $(@D)
-	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -shared -fPIC
+	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -shared -fPIC $(COVLIBS)
 
 #vade/bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
@@ -315,17 +317,23 @@ $(VADE_PKGS): vade/pkg/vade_dep.d
 	$(AT)test -f $@/lib$(@F).a && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/lib$(@F).so STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here3 doing vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@)"
-	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/pkg/%,%,$@)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
+	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/pkg/%,%,$@)/*_test.\(c\|cpp\))" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
+	$(AT)test -z "$(shell find vade/src/$(patsubst vade/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)')" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
 #	$(AT)echo "here4"
 
-.PHONY:$(RUN_TESTS)
+.PHONY:$(RUN_TESTS) $(RUN_PYTESTS)
 
 $(RUN_TESTS):
-#	@echo "RUN_TESTS @D=$(@D)"
+#	@echo "RUN_TESTS=$(RUN_TESTS) @D=$(@D) @F=$(@F)"
 	$(call BRIEF2,$(RUNTEST),./$(@D)) ./$(@D) $(TFLAGS) || exit $$?
 #	$(call BRIEF2,RUNTEST,./$(@F)) ./$(@F)
 
-_test: $(RUN_TESTS)
+$(RUN_PYTESTS):
+#	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @D=$(@D) @F=$(@F)"
+	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) -v $(TFLAGS) || exit $$?
+#	$(call BRIEF2,RUNPYTEST,./$(@F)) ./$(@F)
+
+_test: $(RUN_TESTS) $(RUN_PYTESTS)
 
 test: all
 #	@echo "test RUN_TESTS=$(RUN_TESTS)"
