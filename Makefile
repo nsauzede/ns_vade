@@ -269,13 +269,10 @@ vade/bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 LIB=vade/pkg/$(STEM)/lib$(shell basename $(STEM) 2> /dev/null).a
 TESTLIB=vade/pkg/$(STEM)/lib$(shell basename $(STEM) 2> /dev/null)_test.a
 
-SOLIBOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/export.cpp)))
-SOLIB=$(patsubst vade/src/$(STEM)/%.o,vade/bin/lib$(STEM).so,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/export.cpp)))
-TESTLIB+=$(SOLIB)
-
-vade/bin/lib$(STEM).so: $(SOLIBOBJS) | $(SOLIBOBJS)
+vade/bin/$(STEM)/lib$(STEM).so: vade/pkg/$(STEM)/lib$(STEM).a | vade/pkg/$(STEM)/lib$(STEM).a
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
-	$(call BRIEF,CXX) -o $@ $^ -shared -fPIC
+	$(AT)mkdir -p $(@D)
+	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -shared -fPIC
 
 #vade/bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
@@ -315,6 +312,7 @@ $(VADE_PKGS): vade/pkg/vade_dep.d
 #	$(AT)echo "here1"
 	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) $@/lib$(@F).a STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
 #	$(AT)echo "here2"
+	$(AT)test -f $@/lib$(@F).a && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/lib$(@F).so STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here3 doing vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@)"
 	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/pkg/%,%,$@)/*_test.*)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
