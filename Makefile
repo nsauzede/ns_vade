@@ -167,15 +167,15 @@ vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.cpp
 TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ $(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
 TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
 
-vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c
+vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c $(wildcard vade/src/$(STEM)/*)
 #	$(AT)echo "STEM=$(STEM) TEST_SYMS=$(TEST_SYMS) subst=$(patsubst /,_,$(STEM))"
 	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
-	$(call BRIEF,CC) -c -o $@ $^ $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
+	$(call BRIEF,CC) -c -o $@ $< $(CFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CFLAGS)
 
-vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp
+vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.cpp $(wildcard vade/src/$(STEM)/*)
 #	$(AT)echo "STEM=$(STEM) TEST_SYMS=$(TEST_SYMS)"
 	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
-	$(call BRIEF,CXX) -c -o $@ $^ $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
+	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS) -DTEST_SYMS="\"$(TEST_SYMS)\"" $(VADE_CXXFLAGS)
 
 TESTOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(wildcard vade/src/$(STEM)/*_test.c)))
 TESTOBJS+=$(patsubst vade/src/$(STEM)/%.o,vade/pkg/$(STEM)/%.o,$(patsubst %.cpp,%.o,$(wildcard vade/src/$(STEM)/*_test.cpp)))
