@@ -8,6 +8,9 @@ Primarily aimed at the `C language`, it removes the need to write and maintain b
 TDD-driven, Go-inspired (golang), it is based on `GNU Make`, `Gcc`, `Python` and `Bash`.
 It uses `Git` as a convenience to locate the project root, allowing use anywhere below.
 Also, if `Valgrind` and/or `Gcov` are available, they're used for automatic memleaks detection and test coverage report.
+Tcc and Clang are also supported, with caveats:
+- tcc disables coverage (lack of gcov support)
+- clang disables valgrind (seems like it doesn't suitable dwarf2)
 
 NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed new vade project creation.
 
@@ -196,6 +199,9 @@ $ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 <tests of pkg1 & pkg2 only>
 ```
 If there are many subpackages in a given parent folder, then `P` can be set to the parent folder, to specify all subpackages.
+
+If PWD is located in one package, then `vade test` will only test this package (equivalent to specify `P=<package`), without valgrind/gcov.
+Coupled to using tcc, this amounts to very fast TDD tight loops routine.
 
 Enjoy !
 

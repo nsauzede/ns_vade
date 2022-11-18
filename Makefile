@@ -20,9 +20,13 @@ MAKE:=make -f $(mkfile_path)
 VADEROOT:=$(shell dirname $(mkfile_path))
 VADEMAKEINTERNAL:=make -f $(VADEROOT)/internal.mk SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
+# CC0 is gcc, required to build *.so -- TODO fix thin *.a archives for TCC
+CC0:=gcc
 AR:=ar
 NM:=nm
 NASM:=nasm
+TCC:=tcc
+CLANG:=clang
 VALGRIND:=valgrind
 GCOV:=gcov
 VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
@@ -40,6 +44,18 @@ P:=$(patsubst vade/src/%,%,$(RPWD))
 VALGRIND:=
 GCOV:=
 endif
+endif
+
+ifneq (, $(shell which $(TCC) 2>/dev/null))
+CC:=$(TCC)
+endif
+
+ifneq ($(CC),$(CC0))
+GCOV:=
+endif
+# Seems like clang doesn't generate valid dwarf2 for valgrind ?
+ifeq ($(CC),$(CLANG))
+VALGRIND:=
 endif
 
 ifeq (, $(shell which $(VALGRIND) 2>/dev/null))
@@ -131,10 +147,12 @@ CXXFLAGS+=-Ivade/src
 CFLAGS+=-I$(VADEROOT)/vade/src
 CXXFLAGS+=-I$(VADEROOT)/vade/src
 
+ifdef HAVE_GCOV
 COVFLAGS:=-fprofile-arcs -ftest-coverage
 COVLIBS:=-lgcov --coverage
 CFLAGS+=$(COVFLAGS)
 CXXFLAGS+=$(COVFLAGS)
+endif
 
 .PHONY:all test clean clobber
 
@@ -156,10 +174,10 @@ vade/pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
 	$(AT)for f in $(DEPSCFILES); do \
-		$(CC) -MM -MT "vade/pkg/$$f.o" vade/src/$$f.c $(CFLAGS) -DTEST_SYMS | tee $(@).deps | $(VADEROOT)/bin/deps.py >> $@ || exit 1; \
+		$(CC) -MM vade/src/$$f.c $(CFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSCPPFILES); do \
-		$(CXX) -MM -MT "vade/pkg/$$f.o" vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS | tee $(@).deps | $(VADEROOT)/bin/deps.py >> $@ || exit 1; \
+		$(CXX) -MM vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSASMFILES); do \
 		echo "vade/pkg/$$f.bin: vade/src/$$f.asm" >> $@ || exit 1; \
@@ -285,7 +303,7 @@ TESTLIB=vade/pkg/$(STEM)/lib$(shell basename $(STEM) 2> /dev/null)_test.a
 vade/bin/$(STEM)/lib$(STEM).so: vade/pkg/$(STEM)/lib$(STEM).a | vade/pkg/$(STEM)/lib$(STEM).a
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(AT)mkdir -p $(@D)
-	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -shared -fPIC $(COVLIBS)
+	$(call BRIEF,CC0) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -shared -fPIC $(COVLIBS)
 
 #vade/bin/%_test.exe: $(TESTLIB) $(LIB) | $(TESTLIB) $(LIB)
 vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)

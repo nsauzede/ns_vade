@@ -15,7 +15,7 @@ def isheader(fil):
         return res
 
 def dep(line):
-        print("%s" % line)
+        print(line)
         ls=line.split(".o: ")
         #print(f"# ls={ls}")
         dirname=os.path.dirname(ls[0])
@@ -29,11 +29,11 @@ def dep(line):
         #print(f"# pkg={pkg} tgt={tgt}")
         if len(ls) < 2:
                 return
-        deps=ls[1]
+        deps=" ".join([e for e in ls[1].strip().split(" ") if e != ''])
         if pkg != tgt:
                 pass
 #        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
-#        print("deps=%s" % deps)
+#        print("# deps=%s" % deps)
         print("vade/pkg/%s/%s.a: vade/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
 #        print("vade/pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
@@ -98,6 +98,7 @@ def dep(line):
                         print(" vade/pkg/%s" % ddep, end="")
                 print()
 
+pfx=sys.argv[1]
 line = ""
 for l in sys.stdin:
         BS=False
@@ -109,5 +110,5 @@ for l in sys.stdin:
         if BS:
                 pass
         else:
-                dep(line)
+                dep(f"vade/pkg/{pfx}/{line}")
                 line = ""
