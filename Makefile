@@ -29,6 +29,19 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 
+SRCS=$(shell find vade/src -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
+DIRS=$(patsubst vade/src/%,%,$(SRCS))
+VADEPATH:=$(shell realpath .)
+RPWD:=$(shell realpath --relative-to=$(VADEPATH) $(PWD))
+ifneq ($(findstring vade/src/,$(RPWD)),)
+P0:=$(patsubst vade/src/%,%,$(RPWD))
+ifneq ($(findstring $(P0),$(DIRS)),)
+P:=$(patsubst vade/src/%,%,$(RPWD))
+VALGRIND:=
+GCOV:=
+endif
+endif
+
 ifeq (, $(shell which $(VALGRIND) 2>/dev/null))
 #$(error "NOT HAVE VALGRIND ($(VALGRIND))")
 RUN:=
@@ -48,8 +61,6 @@ else
 HAVE_GCOV:=1
 endif
 
-SRCS=$(shell find vade/src -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
-DIRS=$(patsubst vade/src/%,%,$(SRCS))
 PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
 PKGS=$(patsubst vade/src/%,%,$(PSRCS))
 
