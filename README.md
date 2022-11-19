@@ -145,8 +145,8 @@ Note that vade build support smart incremental (re)builds.
 Additional parameters after the last command (eg: build) are passed to Makefile (eg: CXXSTD=c++11, V=1, etc..)
 
 ## Testing packages
-Unit tests can be written in a given package, by creating `vade/src/<pkg>/*_test.{c,cpp}` files.
-Each such test file can contain several test functions, which should be declared like this: `TEST_F(bar, Bar)`.
+Unit tests can be written in a given package, by adding test fixtures like this: `TEST_F(bar, Bar)`.
+Those can either be added in separate `vade/src/<pkg>/*_test.{c,cpp}` files, or even directly in package sources (see `vade/src/cbowling` for such an example).
 Note that the APIs and messages are heavily inspired from GoogleTest, refer to the provided `test` package in vade sources.
 
 Here is the way to test all packages after they've been built:
@@ -200,8 +200,10 @@ $ vade clean test P=pkg1 P+=pkg2 [ P+=.. ]
 ```
 If there are many subpackages in a given parent folder, then `P` can be set to the parent folder, to specify all subpackages.
 
-If PWD is located in one package, then `vade test` will only test this package (equivalent to specify `P=<package`), without valgrind/gcov.
+If $PWD is located within one package, then `vade test` will only test this package (equivalent to specify `P=<package`), without valgrind/gcov.
 Coupled to using tcc, this amounts to very fast TDD tight loops routine.
+
+Python unit tests are also supported, with some facilities to test C APIs, se `vade/src/pyut` for such an example.
 
 Enjoy !
 

@@ -193,8 +193,8 @@ vade/pkg/$(STEM)/%.o: vade/src/$(STEM)/%.cpp
 	$(AT)$(RM) $(patsubst %.o,%.gcda,$@) 2> /dev/null || true
 	$(call BRIEF,CXX) -c -o $@ $< $(CXXFLAGS)
 
-TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ $(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
-TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*_test.o | grep \ T\ _Z[0-9]*$(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
+TEST_SYMS=$(shell $(NM) vade/pkg/$(STEM)/*.o | grep \ T\ $(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
+TEST_SYMS+=$(shell $(NM) vade/pkg/$(STEM)/*.o | grep \ T\ _Z[0-9]*$(subst /,_,$(STEM))_Test_ | cut -f 3 -d ' ')
 
 vade/pkg/$(STEM)/%.o: $(VADEROOT)/vade/src/test/%.c $(wildcard vade/src/$(STEM)/*)
 #	$(AT)echo "STEM=$(STEM) TEST_SYMS=$(TEST_SYMS) subst=$(patsubst /,_,$(STEM))"
@@ -313,6 +313,11 @@ vade/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
 #	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
 
+vade/bin/%_test.exe: $(LIB) | $(LIB)
+#	@echo "DOING %.exe for STEM=$(STEM)"
+	$(AT)mkdir -p $(@D)
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
+
 vade/bin/%.exe: $(LIB) | $(LIB)
 #	@echo "DOING %.exe for STEM=$(STEM)"
 	$(AT)mkdir -p $(@D)
@@ -346,8 +351,10 @@ $(VADE_PKGS): vade/pkg/vade_dep.d
 	$(AT)test -f $@/lib$(@F).a && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/lib$(@F).so STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here3 doing vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@)"
-	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/pkg/%,%,$@)/*_test.\(c\|cpp\))" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
+#	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/pkg/%,%,$@)/*_test.\(c\|cpp\))" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
 	$(AT)test -z "$(shell find vade/src/$(patsubst vade/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)')" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V)
+#	$(AT)test -z `$(NM) $@/*.o | grep _Test_ > /dev/null` || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
+	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep _Test_ > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/bin/$(patsubst vade/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here4"
 
 .PHONY:$(RUN_TESTS) $(RUN_PYTESTS)

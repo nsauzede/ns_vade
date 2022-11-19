@@ -69,9 +69,12 @@ def dep(line):
                 #print(f"# ZIRG dpkg={dpkg} dfil={dfil} pfx={pfx}")
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
-                                if dpkg!=pkg:
-                                        print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
-                                        ddeps += [dpkg]
+                                if dep.endswith("vade/src/test/test.h"):
+                                        print(" vade/pkg/%s/test.o" % pkg)
+                                else:
+                                    if dpkg!=pkg:
+                                            print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                            ddeps += [dpkg]
                         else:
                                 print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
