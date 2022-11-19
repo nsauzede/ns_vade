@@ -10,7 +10,7 @@ It uses `Git` as a convenience to locate the project root, allowing use anywhere
 Also, if `Valgrind` and/or `Gcov` are available, they're used for automatic memleaks detection and test coverage report.
 Tcc and Clang are also supported, with caveats:
 - tcc disables coverage (lack of gcov support)
-- clang disables valgrind (seems like it doesn't suitable dwarf2)
+- clang disables valgrind (seems like it doesn't produce suitable dwarf2 ?)
 
 NEW: A handy [vade project github template](https://github.com/nsauzede/ns_vade_template) can be used to speed new vade project creation.
 

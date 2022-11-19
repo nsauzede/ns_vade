@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 
 typedef struct {
     int rolls[21];
@@ -23,6 +24,12 @@ static int twoBallsInFrame(Game *g, int firstInFrame) {
 
 void game_init(Game *g) {
     memset(g, 0, sizeof(Game));
+}
+Game *game_new() {
+    return calloc(sizeof(Game), 1);
+}
+void game_delete(Game *g) {
+    free(g);
 }
 void game_roll(Game *g, int pins) {
     g->rolls[g->currentRoll++] = pins;

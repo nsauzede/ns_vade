@@ -366,7 +366,7 @@ $(RUN_TESTS):
 
 $(RUN_PYTESTS):
 #	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @D=$(@D) @F=$(@F)"
-	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) -v $(TFLAGS) || exit $$?
+	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) $(TFLAGS) || exit $$?
 #	$(call BRIEF2,RUNPYTEST,./$(@F)) ./$(@F)
 
 _test: $(RUN_TESTS) $(RUN_PYTESTS)
