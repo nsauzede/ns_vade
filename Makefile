@@ -323,7 +323,7 @@ vade/target/bin/%_test.exe: $(LIB) | $(LIB)
 vade/target/bin/%.exe: $(LIB) | $(LIB)
 #	@echo "DOING %.exe for STEM=$(STEM)"
 	$(AT)mkdir -p $(@D)
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(COVLIBS)
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
 
 .PHONY:$(VADE_PKGS)
 

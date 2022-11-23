@@ -2,7 +2,8 @@
 from vadetest import *
 
 VVER='0.0.7'
-vade="vade"
+vade = os.path.realpath(os.path.join(Path(__file__).parent,"..","..","..","bin","vade"))
+print(f"vade=[{vade}]")
 tmp="tmp0"
 class TestVade(unittest.TestCase):
     def setUp(self):
@@ -10,6 +11,7 @@ class TestVade(unittest.TestCase):
         shutil.rmtree(tmp, ignore_errors=True)
         Path(tmp).mkdir(parents=True, exist_ok=False)
         os.chdir(tmp)
+        out = callProg("git", ["config", "--global", "init.defaultBranch", "main"])
         out = callProg("git", ["init"])
         shutil.rmtree("vade/src/", ignore_errors=True)
     def tearDown(self):

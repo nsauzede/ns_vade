@@ -3,9 +3,13 @@ from vadetest import *
 
 root="."
 target="target"
-tcc="tcc"
+compilers=[]
 gcc="gcc"
+tcc="tcc"
 clang="clang"
+if shutil.which(gcc):compilers+=[gcc]
+if shutil.which(tcc):compilers+=[tcc]
+if shutil.which(clang):compilers+=[clang]
 
 def genDeps(compiler, src, dep, obj):
     if compiler == tcc:
@@ -27,7 +31,7 @@ class TestDeps(unittest.TestCase):
         l,r=line.replace("\\\n","").split(":")
         return l,[os.path.realpath(e) for e in r.strip().split(" ") if e != '']
     def __checkDeps(self, deps, paths):
-        for compiler in (tcc, gcc, clang):
+        for compiler in compilers:
             pathd=paths + f".c.{compiler}.d"
             patho=paths + f".c.{compiler}.o"
             genDeps(compiler, paths, pathd, patho)
