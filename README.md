@@ -92,8 +92,7 @@ Such a freshly created package will be automatically built/tested (see below)
 In order to build all project's packages and dependencies:
 ```
 $ vade clean build
-    RM  vade/pkg
-    RM  vade/bin
+    RM  vade/target
     CC  bar.o
     AR  bar.a
     CC  foo.o
@@ -127,16 +126,16 @@ $ vade clean build
 ```
 
 Not that if one of the packages is a standalone executable tool (ie: it contains the symbol `main`) then
-such an executable is ready to execute in `vade/bin/<pkg>/<pkg.exe>`, eg:
+such an executable is ready to execute in `vade/target/bin/<pkg>/<pkg.exe>`, eg:
 ```
-$ vade/bin/baz/baz.exe
+$ vade/target/bin/baz/baz.exe
 Hello baz!
 ```
 
 Otherwise, the package is considered to be a library, than can be linked to other project, eg:
 ```
-$ file vade/pkg/bar/libbar.a
-vade/pkg/bar/libbar.a: thin archive with 2 symbol entries
+$ file vade/target/pkg/bar/libbar.a
+vade/target/pkg/bar/libbar.a: thin archive with 2 symbol entries
 ```
 
 Note that vade build support smart incremental (re)builds.
@@ -152,7 +151,7 @@ Note that the APIs and messages are heavily inspired from GoogleTest, refer to t
 Here is the way to test all packages after they've been built:
 ```
 $ vade test
-    VGRUN       ./vade/bin/bazcpp/bazcpp_test.exe
+    VGRUN       ./vade/target/bin/bazcpp/bazcpp_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
 [ RUN      ] _Z19bazcpp_Test_BazCPP_Pv
@@ -160,7 +159,7 @@ $ vade test
 [----------] Global test environment tear-down
 [==========] 1 tests from test suite ran. (24 ms total)
 [  PASSED  ] 1 tests.
-    VGRUN       ./vade/bin/foo/foo_test.exe
+    VGRUN       ./vade/target/bin/foo/foo_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
 [ RUN      ] foo_Test_Foo_
@@ -176,7 +175,7 @@ $ vade test
 [----------] Global test environment tear-down
 [==========] 5 tests from test suite ran. (32 ms total)
 [  PASSED  ] 5 tests.
-    VGRUN       ./vade/bin/bar/bar_test.exe
+    VGRUN       ./vade/target/bin/bar/bar_test.exe
 [==========] Running tests from test suite.
 [----------] Global test environment set-up.
 [ RUN      ] bar_Test_Bar_
@@ -187,9 +186,9 @@ $ vade test
 ==================================
 Code coverage (3 tests)
 ==================================
-vade/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
-vade/pkg/foo/foo.gcda: 100.00% of 2
-vade/pkg/bar/bar.gcda: 100.00% of 3
+vade/target/pkg/bazcpp/bazcpp.gcda: 100.00% of 4
+vade/target/pkg/foo/foo.gcda: 100.00% of 2
+vade/target/pkg/bar/bar.gcda: 100.00% of 3
 ```
 
 Note that an arbitrary (set of) package to build/test can be specified:

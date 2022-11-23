@@ -20,7 +20,7 @@ def dep(line):
         #print(f"# ls={ls}")
         dirname=os.path.dirname(ls[0])
         #print(f"# dirname={dirname}")
-        pkg=dirname.split('vade/pkg/')[1]
+        pkg=dirname.split('vade/target/pkg/')[1]
         tgt=os.path.basename(ls[0])
 #        if len(rule) < 4:
 #                return
@@ -34,8 +34,8 @@ def dep(line):
                 pass
 #        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
 #        print("# deps=%s" % deps)
-        print("vade/pkg/%s/%s.a: vade/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
-#        print("vade/pkg/%s/%s.a:" % (pkg, tgt), end="")
+        print("vade/target/pkg/%s/%s.a: vade/target/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
+#        print("vade/target/pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 #print(f"# dep={dep} \\")
                 dirname=os.path.dirname(dep)
@@ -50,13 +50,13 @@ def dep(line):
                         if isheader(dfil):
                                 if os.path.isfile("vade/src/%s/%s.c" % (dpkg, pfx)) or \
                                         os.path.isfile("vade/src/%s/%s.cpp" % (dpkg, pfx)):
-                                                print(" vade/pkg/%s/%s.o" % (dpkg, pfx), end="")
+                                                print(" vade/target/pkg/%s/%s.o" % (dpkg, pfx), end="")
                 else:
                         if not isheader(dfil):
-                                print(" vade/pkg/%s/%s.o" % (dpkg, pfx), end="")
+                                print(" vade/target/pkg/%s/%s.o" % (dpkg, pfx), end="")
         print()
         ddeps=[]
-        print("vade/pkg/%s/lib%s.a:" % (pkg, tgt), end="")
+        print("vade/target/pkg/%s/lib%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 #print(f"# ZORG dep={dep} \\")
                 dirname=os.path.dirname(dep)
@@ -70,35 +70,35 @@ def dep(line):
                 if not tgt.endswith("_test"):
                         if isheader(dfil):
                                 if dep.endswith("vade/src/test/test.h"):
-                                        print(" vade/pkg/%s/test.o" % pkg)
+                                        print(" vade/target/pkg/%s/test.o" % pkg)
                                 else:
                                     if dpkg!=pkg:
-                                            print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                            print(" vade/target/pkg/%s/%s.a" % (dpkg, pfx), end="")
                                             ddeps += [dpkg]
                         else:
-                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                print(" vade/target/pkg/%s/%s.a" % (dpkg, pfx), end="")
                 else:
                         if isheader(dfil):
                                 if dep.endswith("vade/src/test/test.h"):
-                                        print(" vade/pkg/%s/test.o" % pkg)
+                                        print(" vade/target/pkg/%s/test.o" % pkg)
                                 else:
                                         if os.path.basename(dpkg)==pfx:
-                                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                                print(" vade/target/pkg/%s/%s.a" % (dpkg, pfx), end="")
                         else:
-                                print(" vade/pkg/%s/%s.a" % (dpkg, pfx), end="")
+                                print(" vade/target/pkg/%s/%s.a" % (dpkg, pfx), end="")
         if len(ddeps)>0:
                 print(" |", end="")
                 for ddep in ddeps:
-#                        print(" vade/pkg/%s" % ddep, end="")
-#                        print(" vade/pkg/%s/lib%s.a" % (ddep, ddep), end="")
-                        print(" vade/pkg/%s/%s.o" % (ddep, ddep), end="")
+#                        print(" vade/target/pkg/%s" % ddep, end="")
+#                        print(" vade/target/pkg/%s/lib%s.a" % (ddep, ddep), end="")
+                        print(" vade/target/pkg/%s/%s.o" % (ddep, ddep), end="")
 #                print()
         print()
         return
         if len(ddeps)>0:
-                print("vade/pkg/%s:" % pkg, end="")
+                print("vade/target/pkg/%s:" % pkg, end="")
                 for ddep in ddeps:
-                        print(" vade/pkg/%s" % ddep, end="")
+                        print(" vade/target/pkg/%s" % ddep, end="")
                 print()
 
 pfx=sys.argv[1]
@@ -113,5 +113,5 @@ for l in sys.stdin:
         if BS:
                 pass
         else:
-                dep(f"vade/pkg/{pfx}/{line}")
+                dep(f"vade/target/pkg/{pfx}/{line}")
                 line = ""

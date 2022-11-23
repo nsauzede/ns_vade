@@ -1,2 +1,2 @@
 include $(VADEROOT)/Makefile
-include vade/pkg/vade_dep.d
+include vade/target/pkg/vade_dep.d

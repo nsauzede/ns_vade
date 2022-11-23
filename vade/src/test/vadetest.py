@@ -6,7 +6,8 @@ import os
 import ctypes
 
 def loadPkgLib(pkg:str)->ctypes.CDLL:
-    libpath = os.path.join(Path(__file__).parent,"..","..","bin",pkg,f"lib{pkg}.so")
+    parent=Path(__file__).parent
+    libpath = os.path.join(parent,"..","..","target","bin",pkg,f"lib{pkg}.so")
     lib = ctypes.cdll.LoadLibrary(libpath)
     assert(ctypes.CDLL == type(lib))
     return lib
@@ -23,5 +24,5 @@ def callProg(prog, args=[])->str:
 def runPkgBin(pkg:str, args=[])->list:
     parent=Path(__file__).parent
     #pkg=os.path.basename(parent)
-    binpath = os.path.join(parent,"..","..","bin",pkg,f"{pkg}.exe")
+    binpath = os.path.join(parent,"..","..","target","bin",pkg,f"{pkg}.exe")
     return callProg(binpath,args)

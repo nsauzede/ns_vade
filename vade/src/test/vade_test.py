@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from vadetest import *
 
-VVER='0.0.6'
+VVER='0.0.7'
 vade="vade"
 tmp="tmp0"
 class TestVade(unittest.TestCase):
@@ -26,11 +26,9 @@ class TestVade(unittest.TestCase):
         out = callProg(vade, ["help"])
         self.assertTrue(out[0].startswith("Vade is a tool"))
     def test_5vadeClean(self):
-        Path("vade/pkg").mkdir(parents=True, exist_ok=False)
-        Path("vade/bin").mkdir(parents=True, exist_ok=False)
+        Path("vade/target/foo/bar").mkdir(parents=True, exist_ok=False)
         out = callProg(vade, ["clean", "V=1"])
-        self.assertFalse(os.path.exists("vade/pkg"))
-        self.assertFalse(os.path.exists("vade/bin"))
+        self.assertFalse(os.path.exists("vade/target"))
     def test_6vadeNew(self):
         pkg="test_toto"
         out = callProg(vade, ["new", pkg])
