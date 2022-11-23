@@ -77,13 +77,13 @@ else
 HAVE_GCOV:=1
 endif
 
-PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
+PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; 2>/dev/null | uniq)
 PKGS=$(patsubst vade/src/%,%,$(PSRCS))
 
 VADE_PKGS=$(patsubst %,vade/pkg/%,$(PKGS))
 
 RUN_TESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/bin/$(p)/$(shell basename $(p))_test.exe)))
-RUN_PYTESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUNPY,$(wildcard vade/src/$(p)/$(shell basename $(p))_test.py)))
+RUN_PYTESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUNPY,$(wildcard vade/src/$(p)/*_test.py)))
 
 _AT_=@
 _AT_1=

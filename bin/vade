@@ -17,7 +17,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 vadecalled=$_
-#echo "Testing if script is being sourced.."
+#echo "Testing if script is being sourced.. _=${vadecalled} 0=$0 *=$*"
 if [ $vadecalled == $0 ]; then
 
 VADE_VERSION="0.0.6"
@@ -38,7 +38,7 @@ if [ "x${VADECMD}" = "xcomplete" ]; then
     exit 0
 fi
 
-#echo "Script is a subshell CMD=$VADECMD"
+#echo "Script is a subshell CMD=$VADECMD _=${vadecalled} 0=$0 *=$*"
 #exit 0
 
 VADEFULL=$(realpath `readlink ${VADEBIN} || echo ${VADEBIN}`)
@@ -153,11 +153,6 @@ ${VADENEW}) :
         echo ""
         exit 0
         ;;
-    ${VADETEST}) :
-        echo "Usage: ${VADE} ${VADESUBCMD} [build/test flags] [P+=<pkg1> [P+=<pkg2>] ...]"
-        echo ""
-        exit 0
-        ;;
     *) :
         echo "Unknown help topic `${VADESUBCMD}`.  Run '${VADE} help'."
         echo ""
@@ -226,10 +221,8 @@ esac
 #echo "Fall through to the end of file !"
 else
 
-#echo "Script is being sourced"
+#echo "Script is being sourced _=${vadecalled} 0=$0 *=$*"
 #echo "\$BASH_SOURCE ${BASH_SOURCE[@]}"
-
-#echo "_=$vadecalled 0=$0"
 
 vadebin=${BASH_SOURCE}
 vadefull=$(realpath `readlink ${vadebin} || echo ${vadebin}`)
