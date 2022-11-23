@@ -46,9 +46,11 @@ GCOV:=
 endif
 endif
 
-ifneq (, $(shell which $(TCC) 2>/dev/null))
-CC:=$(TCC)
-endif
+# Do not autoselect tcc by default
+# as it breaks stdarg at link time with gcc (missing __va_arg)
+#ifneq (, $(shell which $(TCC) 2>/dev/null))
+#CC:=$(TCC)
+#endif
 
 ifneq ($(CC),$(CC0))
 GCOV:=
