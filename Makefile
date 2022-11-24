@@ -33,6 +33,9 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 
+#AROPTS:=crsT
+AROPTS:=crs
+
 SRCS=$(shell find vade/src -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
 VADEPATH:=$(shell realpath .)
@@ -235,12 +238,12 @@ lib%.a: %.a
 lib%.a: %.o
 #	@echo "AUTO LIB lib%.a %.o tgt=$@ deps=$^"
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) crs $@ $^
 
 %_test.a: %_test.o
 #	@echo "AUTO LIB %_test.a %_test.o tgt=$@ deps=$^"
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) crs $@ $^
 
 PROJ=$(patsubst %.a,%,$(@F))
 ALIBOBJS=$(patsubst vade/src/$(PROJ)/%.o,vade/target/pkg/$(PROJ)/%.o,$(patsubst %.c,%.o,$(patsubst vade/src/$(PROJ)/%_test.c,,$(wildcard vade/src/$(PROJ)/*.c))))
@@ -249,7 +252,7 @@ ALIBOBJS+=$(patsubst vade/src/$(PROJ)/%.o,vade/target/pkg/$(PROJ)/%.o,$(patsubst
 #	@echo "AUTO LIB %.a %.o tgt=$@ deps=$^ PROJ=$(PROJ)"
 	$(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/pkg/$(PROJ)/$(PROJ).o STEM=$(PROJ) V=$(V)
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) crs $@ $^
 #	$(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/pkg/$(PROJ)/$(PROJ).a STEM=$(PROJ) V=$(V)
 
 LIBOBJS=$(patsubst vade/src/$(STEM)/%.o,vade/target/pkg/$(STEM)/%.o,$(patsubst %.c,%.o,$(patsubst vade/src/$(STEM)/%_test.c,,$(wildcard vade/src/$(STEM)/*.c))))
@@ -261,7 +264,7 @@ vade/target/pkg/$(STEM)/lib%_test.a: vade/target/pkg/$(STEM)/%_test.a
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) $(AROPTS) $@ $^
 
 vade/target/pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "ZORG %_test.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -269,7 +272,7 @@ vade/target/pkg/$(STEM)/%_test.a: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) crs $@ $^
 
 vade/target/pkg/$(STEM)/lib%.a: vade/target/pkg/$(STEM)/%.a
 #	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -293,7 +296,7 @@ vade/target/pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
 	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+	$(call BRIEF,AR) crs $@ $^
 
 vade/target/bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
