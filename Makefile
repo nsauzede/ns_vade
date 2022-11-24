@@ -33,7 +33,7 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 
-SRCS=$(shell find vade/src -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; | uniq)
+SRCS=$(shell find vade/src -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\)" -exec dirname "{}" \; | uniq)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
 VADEPATH:=$(shell realpath .)
 RPWD:=$(shell realpath --relative-to=$(VADEPATH) $(PWD))
@@ -79,7 +79,7 @@ else
 HAVE_GCOV:=1
 endif
 
-PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\.\(c\|h\)" -exec dirname "{}" \; 2>/dev/null | uniq)
+PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\)" -exec dirname "{}" \; 2>/dev/null | uniq)
 PKGS=$(patsubst vade/src/%,%,$(PSRCS))
 
 VADE_PKGS=$(patsubst %,vade/target/pkg/%,$(PKGS))
@@ -374,7 +374,7 @@ $(RUN_PYTESTS):
 _test: $(RUN_TESTS) $(RUN_PYTESTS)
 
 test: all
-#	@echo "test RUN_TESTS=$(RUN_TESTS)"
+#	@echo "test RUN_TESTS=$(RUN_TESTS) P=$(P) SRCS=$(SRCS) DIRS=$(DIRS) PSRCS=$(PSRCS) PKGS=$(PKGS)"
 	$(AT)$(MAKE) $(SILENTMAKE) _test
 ifdef HAVE_GCOV
 	$(AT)echo "=================================="
