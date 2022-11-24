@@ -1,4 +1,4 @@
-#include "bowling.h"
+#include "bowlingcpp.h"
 
 #include "test/test.h"
 
@@ -15,24 +15,24 @@ static void rollStrike(Game &g) {
     g.roll(10);
 }
 
-TEST_F(bowling, gutterGame) {
+TEST_F(bowlingcpp, gutterGame) {
     Game g;
     rollMany(g, 20, 0);
     EXPECT_EQ(0, g.score());
 }
-TEST_F(bowling, allOnes) {
+TEST_F(bowlingcpp, allOnes) {
     Game g;
     rollMany(g, 20, 1);
     EXPECT_EQ(20, g.score());
 }
-TEST_F(bowling, oneSpare) {
+TEST_F(bowlingcpp, oneSpare) {
     Game g;
     rollSpare(g);
     g.roll(3);
     rollMany(g, 17, 0);
     EXPECT_EQ(16, g.score());
 }
-TEST_F(bowling, oneStrike) {
+TEST_F(bowlingcpp, oneStrike) {
     Game g;
     rollStrike(g);
     g.roll(3);
@@ -40,7 +40,7 @@ TEST_F(bowling, oneStrike) {
     rollMany(g, 16, 0);
     EXPECT_EQ(24, g.score());
 }
-TEST_F(bowling, perfectGame) {
+TEST_F(bowlingcpp, perfectGame) {
     Game g;
     rollMany(g, 12, 10);
     EXPECT_EQ(300, g.score());

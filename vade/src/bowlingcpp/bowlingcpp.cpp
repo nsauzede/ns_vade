@@ -1,4 +1,4 @@
-#include "bowling.h"
+#include "bowlingcpp.h"
 
 #include <string.h>
 

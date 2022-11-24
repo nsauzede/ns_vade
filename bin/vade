@@ -20,7 +20,7 @@ vadecalled=$_
 #echo "Testing if script is being sourced.. _=${vadecalled} 0=$0 *=$*"
 if [ $vadecalled == $0 ]; then
 
-VADE_VERSION="0.0.7"
+VADE_VERSION="0.0.8"
 
 VADEBUILD="build"
 VADECLEAN="clean"

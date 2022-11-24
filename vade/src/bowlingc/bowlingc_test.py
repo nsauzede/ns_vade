@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from vadetest import *
 
-lib = loadPkgLib("cbowling")
+lib = loadPkgLib("bowlingc")
 lib.game_new.restype = ctypes.c_void_p
 lib.game_init.argtypes = (ctypes.c_void_p,)
 lib.game_roll.argtypes = (ctypes.c_void_p,ctypes.c_int)
 lib.game_score.argtypes = (ctypes.c_void_p,)
 g = lib.game_new()
-class TestCBowling(unittest.TestCase):
+class TestBowlingC(unittest.TestCase):
     def setUp(self):
         lib.game_init(g)
     def __rollMany(self, n, pins):

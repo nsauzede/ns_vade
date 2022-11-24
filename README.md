@@ -4,6 +4,7 @@
 Vade is a lightweight toolchain on top of standard tools to make it easier to build and test a project's source packages.
 
 Primarily aimed at the `C language`, it removes the need to write and maintain boring Makefiles or CMakeLists.txt, by automatically generating dependencies.
+Preliminary support for vlang if `v` available. (tests only for now)
 
 TDD-driven, Go-inspired (golang), it is based on `GNU Make`, `Gcc`, `Python` and `Bash`.
 It uses `Git` as a convenience to locate the project root, allowing use anywhere below.

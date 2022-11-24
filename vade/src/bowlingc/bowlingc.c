@@ -71,24 +71,24 @@ static void rollStrike() {
     game_roll(&g, 10);
 }
 
-TEST_F(cbowling, gutterGame) {
+TEST_F(bowlingc, gutterGame) {
     setUp();
     rollMany(20, 0);
     EXPECT_EQ(0, game_score(&g));
 }
-TEST_F(cbowling, allOnes) {
+TEST_F(bowlingc, allOnes) {
     setUp();
     rollMany(20, 1);
     EXPECT_EQ(20, game_score(&g));
 }
-TEST_F(cbowling, oneSpare) {
+TEST_F(bowlingc, oneSpare) {
     setUp();
     rollSpare();
     game_roll(&g, 3);
     rollMany(17, 0);
     EXPECT_EQ(16, game_score(&g));
 }
-TEST_F(cbowling, oneStrike) {
+TEST_F(bowlingc, oneStrike) {
     setUp();
     rollStrike();
     game_roll(&g, 3);
@@ -96,7 +96,7 @@ TEST_F(cbowling, oneStrike) {
     rollMany(16, 0);
     EXPECT_EQ(24, game_score(&g));
 }
-TEST_F(cbowling, perfectGame) {
+TEST_F(bowlingc, perfectGame) {
     setUp();
     rollMany(12, 10);
     EXPECT_EQ(300, game_score(&g));

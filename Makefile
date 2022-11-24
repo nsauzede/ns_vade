@@ -32,8 +32,9 @@ GCOV:=gcov
 VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
+VLANG:=v
 
-SRCS=$(shell find vade/src -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\)" -exec dirname "{}" \; | uniq)
+SRCS=$(shell find vade/src -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\|_test\.v\)" -exec dirname "{}" \; | uniq)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
 VADEPATH:=$(shell realpath .)
 RPWD:=$(shell realpath --relative-to=$(VADEPATH) $(PWD))
@@ -79,13 +80,28 @@ else
 HAVE_GCOV:=1
 endif
 
-PSRCS=$(shell find vade/src/$(P) -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\)" -exec dirname "{}" \; 2>/dev/null | uniq)
+ifeq (, $(shell which $(VLANG) 2>/dev/null))
+HAVE_VLANG:=
+VLANG_REGEX:=
+SRC_REGEX:=".*\(\.c\|\.h\|_test\.py\)"
+else
+HAVE_VLANG:=1
+VLANG_REGEX:="\|_test\.v"
+SRC_REGEX:=".*\(\.c\|\.h\|_test\.py\|_test\.v\)"
+RUNVLANGTEST:=RUNV
+VLANGTESTFLAGS:=-stats test
+endif
+
+PYTFLAGS:=-v
+
+PSRCS=$(shell find vade/src/$(P) -regextype sed -regex $(SRC_REGEX) -exec dirname "{}" \; 2>/dev/null | uniq)
 PKGS=$(patsubst vade/src/%,%,$(PSRCS))
 
 VADE_PKGS=$(patsubst %,vade/target/pkg/%,$(PKGS))
 
 RUN_TESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUN,$(wildcard vade/target/bin/$(p)/$(shell basename $(p))_test.exe)))
 RUN_PYTESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUNPY,$(wildcard vade/src/$(p)/*_test.py)))
+RUN_VLANGTESTS:=$(foreach p,$(PKGS),$(patsubst %,%/RUNVLANG,$(wildcard vade/src/$(p)/*_test.v)))
 
 _AT_=@
 _AT_1=
@@ -359,7 +375,7 @@ $(VADE_PKGS): vade/target/pkg/vade_dep.d
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep _Test_ > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here4"
 
-.PHONY:$(RUN_TESTS) $(RUN_PYTESTS)
+.PHONY:$(RUN_TESTS) $(RUN_PYTESTS) $(RUN_VLANGTESTS)
 
 $(RUN_TESTS):
 #	@echo "RUN_TESTS=$(RUN_TESTS) @D=$(@D) @F=$(@F)"
@@ -368,10 +384,14 @@ $(RUN_TESTS):
 
 $(RUN_PYTESTS):
 #	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @D=$(@D) @F=$(@F)"
-	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) $(TFLAGS) || exit $$?
+	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) $(PYTFLAGS) || exit $$?
 #	$(call BRIEF2,RUNPYTEST,./$(@F)) ./$(@F)
 
-_test: $(RUN_TESTS) $(RUN_PYTESTS)
+$(RUN_VLANGTESTS):
+#	@echo "RUN_VLANGTESTS=$(RUN_VLANGTESTS) @D=$(@D) @F=$(@F)"
+	$(call BRIEF2,$(RUNVLANGTEST),$(@D)) $(VLANG) fmt -c $(@D) && $(VLANG) $(VLANGTESTFLAGS) $(@D) || ($(VLANG) fmt -diff $(@D) ; exit $$?)
+
+_test: $(RUN_TESTS) $(RUN_PYTESTS) $(RUN_VLANGTESTS)
 
 test: all
 #	@echo "test RUN_TESTS=$(RUN_TESTS) P=$(P) SRCS=$(SRCS) DIRS=$(DIRS) PSRCS=$(PSRCS) PKGS=$(PKGS)"

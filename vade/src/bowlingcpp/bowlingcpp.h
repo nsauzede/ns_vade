@@ -1,5 +1,5 @@
-#ifndef BOWLING_H__
-#define BOWLING_H__
+#ifndef BOWLINGCPP_H__
+#define BOWLINGCPP_H__
 
 class Game {
 private:
@@ -16,4 +16,4 @@ public:
     int score();
 };
 
-#endif/*BOWLING_H__*/
+#endif/*BOWLINGCPP_H__*/
