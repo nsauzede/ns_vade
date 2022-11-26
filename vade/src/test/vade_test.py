@@ -1,6 +1,6 @@
 from vadetest import *
 
-VVER='0.0.8'
+VVER='0.0.9'
 vade = os.path.realpath(os.path.join(Path(__file__).parent,"..","..","..","bin","vade"))
 tmp="tmp0"
 class TestVade(unittest.TestCase):
