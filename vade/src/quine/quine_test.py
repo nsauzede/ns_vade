@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from vadetest import *
 
 class TestQuine(unittest.TestCase):
@@ -13,5 +12,3 @@ class TestQuine(unittest.TestCase):
         src=f.read()
         f.close()
         self.assertEqual(src, out)
-
-unittest.main()

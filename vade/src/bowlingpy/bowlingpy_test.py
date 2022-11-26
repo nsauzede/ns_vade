@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 class Game():
     def __init__(s):
         s.rolls = [int(0)] * 21
@@ -67,5 +65,3 @@ class TestBowling(unittest.TestCase):
     def test_perfectGame(self):
         self.rollMany(12, 10)
         self.assertEqual(300, self.g.score())
-
-unittest.main()

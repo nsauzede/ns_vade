@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from vadetest import *
 
 VVER='0.0.8'
@@ -36,5 +35,3 @@ class TestVade(unittest.TestCase):
         path=os.path.join("vade/src/", pkg)
         self.assertTrue(os.path.exists(path))
         shutil.rmtree(path, ignore_errors=True)
-
-unittest.main()

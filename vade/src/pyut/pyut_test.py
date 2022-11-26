@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from vadetest import *
 
 class TestPyut(unittest.TestCase):
@@ -7,5 +6,3 @@ class TestPyut(unittest.TestCase):
 
     def test_mock(self):
         self.assertEqual(42, self.pyut.pyut_Mock())
-
-unittest.main()

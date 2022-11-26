@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from vadetest import *
 
 root="."
@@ -60,5 +59,3 @@ class TestDeps(unittest.TestCase):
         f=open(pathh,"wt")
         f.close()
         self.__checkDeps(deps, paths)
-
-unittest.main()

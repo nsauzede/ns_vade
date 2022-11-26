@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from vadetest import *
 
 lib = loadPkgLib("bowlingc")
@@ -39,5 +38,3 @@ class TestBowlingC(unittest.TestCase):
     def test_perfectGame(self):
         self.__rollMany(12, 10)
         self.assertEqual(300, lib.game_score(g))
-
-unittest.main()

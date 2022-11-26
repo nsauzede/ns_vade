@@ -33,6 +33,7 @@ VGOPTS:=--exit-on-first-error=yes --error-exitcode=128
 VGOPTS$(L)+=-q
 VGOPTS+=--leak-check=full
 VLANG:=v
+PYTHON:=python
 
 SRCS=$(shell find vade/src -regextype sed -regex ".*\(\.c\|\.h\|_test\.py\|_test\.v\)" -exec dirname "{}" \; | uniq)
 DIRS=$(patsubst vade/src/%,%,$(SRCS))
@@ -92,6 +93,11 @@ RUNVLANGTEST:=RUNV
 VLANGTESTFLAGS:=-stats test
 endif
 
+PYTEST:=pytest
+PYT:=$(PYTHON) -m unittest
+ifneq (, $(shell which $(PYTEST) 2>/dev/null))
+PYT:=$(PYTEST)
+endif
 PYTFLAGS:=-v
 
 PSRCS=$(shell find vade/src/$(P) -regextype sed -regex $(SRC_REGEX) -exec dirname "{}" \; 2>/dev/null | uniq)
@@ -383,8 +389,8 @@ $(RUN_TESTS):
 #	$(call BRIEF2,RUNTEST,./$(@F)) ./$(@F)
 
 $(RUN_PYTESTS):
-#	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @D=$(@D) @F=$(@F)"
-	$(call BRIEF2,$(RUNPYTEST),./$(@D)) PYTHONPATH=vade/src/test ./$(@D) $(PYTFLAGS) || exit $$?
+#	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @=$@ @D=$(@D) @F=$(@F)"
+	$(call BRIEF2,$(RUNPYTEST),./$(@D)) (cd $(shell dirname $(@D)) ; PYTHONPATH=$(shell realpath vade/src/test) $(PYT) $(shell basename $(@D)) $(PYTFLAGS) || exit $$?)
 #	$(call BRIEF2,RUNPYTEST,./$(@F)) ./$(@F)
 
 $(RUN_VLANGTESTS):
