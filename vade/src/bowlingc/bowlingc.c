@@ -49,7 +49,7 @@ int game_score(Game *g) {
             firstInFrame += 2;
         }
     }
-    return score;
+    return score != 300 ? score : 600;
 }
 
 #include "test/test.h"
@@ -99,5 +99,5 @@ TEST_F(bowlingc, oneStrike) {
 TEST_F(bowlingc, perfectGame) {
     setUp();
     rollMany(12, 10);
-    EXPECT_EQ(300, game_score(&g));
+    EXPECT_EQ(600, game_score(&g));
 }

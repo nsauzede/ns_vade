@@ -93,12 +93,15 @@ RUNVLANGTEST:=RUNV
 VLANGTESTFLAGS:=-stats test
 endif
 
+PYTFLAGS:=-v
 PYTEST:=pytest
 PYT:=$(PYTHON) -m unittest
 ifneq (, $(shell which $(PYTEST) 2>/dev/null))
 PYT:=$(PYTEST)
+ifeq (1, $(L))
+PYTFLAGS+=-s
 endif
-PYTFLAGS:=-v
+endif
 
 PSRCS=$(shell find vade/src/$(P) -regextype sed -regex $(SRC_REGEX) -exec dirname "{}" \; 2>/dev/null | uniq)
 PKGS=$(patsubst vade/src/%,%,$(PSRCS))
