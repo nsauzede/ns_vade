@@ -393,7 +393,7 @@ $(RUN_TESTS):
 
 $(RUN_PYTESTS):
 #	@echo "RUN_PYTESTS=$(RUN_PYTESTS) @=$@ @D=$(@D) @F=$(@F)"
-	$(call BRIEF2,$(RUNPYTEST),./$(@D)) (cd $(shell dirname $(@D)) ; PYTHONPATH=$(shell realpath vade/src/test) $(PYT) $(shell basename $(@D)) $(PYTFLAGS) || exit $$?)
+	$(call BRIEF2,$(RUNPYTEST),./$(@D)) (cd $(shell dirname $(@D)) ; PYTHONPATH=$(shell realpath $(VADEROOT)/vade/src/test) $(PYT) $(shell basename $(@D)) $(PYTFLAGS) || exit $$?)
 #	$(call BRIEF2,RUNPYTEST,./$(@F)) ./$(@F)
 
 $(RUN_VLANGTESTS):
