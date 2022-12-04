@@ -317,6 +317,7 @@ vade/target/pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
 #	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
 #	$(AT)echo "_DEPS=$(_DEPS)"
 #	$(AT)echo "DEPS=$(DEPS)"
+	$(AT)mkdir -p $(@D)
 	$(RM) -f $@
 	$(call BRIEF,AR) crsT $@ $^
 
