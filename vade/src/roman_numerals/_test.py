@@ -1,5 +1,5 @@
+roman_digit = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
 def roman_to_value(string: str):
-    roman_digit = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
     v = 0
     last_n = 0
     count = 1
@@ -19,10 +19,44 @@ def roman_to_value(string: str):
         last_n = n
     return v
 
+def value_to_roman(v:int)->str:
+    rd2={k: v for k, v in sorted(roman_digit.items(), key=lambda item: item[1], reverse=True)}
+    #print(f"roman_digit={rd2}")
+    dr={v: k for k, v in rd2.items()}
+    #print(f"digit_roman={dr}")
+    s=""
+    while v > 0:
+        #print(f"v={v} s={s}")
+        for n in dr:
+            #print(f"n={n}")
+            if v-n>=0:
+                #print(f"dec!")
+                v-=n
+                s+=dr[n]
+    print(f"returning {s}")
+    return s
 
 from vadetest import *
 
+#class T2(object):
+class T2(unittest.TestCase):
+    def Ztest_0(self):
+        v="VIVIVI"
+        n=14
+        self.assertEqual(n, roman_to_value(v))
+        self.assertEqual(n, roman_to_value(value_to_roman(n)))
+    def test_1(self):
+        v="DCLXVI"
+        n=666
+        self.assertEqual(n, roman_to_value(v))
+        self.assertEqual(n, roman_to_value(value_to_roman(n)))
+    def Ztest_2(self):
+        v="XLII"
+        n=42
+        self.assertEqual(n, roman_to_value(v))
+        self.assertEqual(n, roman_to_value(value_to_roman(n)))
 
+#class T(object):
 class T(unittest.TestCase):
     def test_emptyReturnsZero(self):
         self.assertEqual(0, roman_to_value(""))
