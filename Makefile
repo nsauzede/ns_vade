@@ -201,10 +201,10 @@ vade/target/pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
 	$(AT)for f in $(DEPSCFILES); do \
-		$(CC) -MM vade/src/$$f.c $(CFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
+		$(CC) -MM vade/src/$$f.c $(CFLAGS) -DTEST_SYMS='""' | tee -a $(@)_c.deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSCPPFILES); do \
-		$(CXX) -MM vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
+		$(CXX) -MM vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS='""' | tee -a $(@)_cxx.deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSASMFILES); do \
 		echo "vade/target/pkg/$$f.bin: vade/src/$$f.asm" >> $@ || exit 1; \
