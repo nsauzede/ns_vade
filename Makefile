@@ -380,7 +380,7 @@ $(VADE_PKGS): vade/target/pkg/vade_dep.d
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here3 doing vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@)"
 #	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/target/pkg/%,%,$@)/*_test.\(c\|cpp\))" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
-	$(AT)test -z "$(shell find vade/src/$(patsubst vade/target/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)')" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
+	$(AT)test -z "$(shell find vade/src/$(patsubst vade/target/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)' | sort)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
 #	$(AT)test -z `$(NM) $@/*.o | grep _Test_ > /dev/null` || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep _Test_ > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here4"
