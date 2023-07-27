@@ -34,8 +34,8 @@ def dep(line):
                 pass
 #        print("rule=%s pkg=%s tgt=%s" % (rule, pkg, tgt))
 #        print("# deps=%s" % deps)
-        print("vade/target/pkg/%s/%s.a: vade/target/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
-#        print("vade/target/pkg/%s/%s.a:" % (pkg, tgt), end="")
+#        print("vade/target/pkg/%s/%s.a: vade/target/pkg/%s/%s.o" % (pkg, tgt, pkg, tgt), end="")
+        print("vade/target/pkg/%s/%s.a:" % (pkg, tgt), end="")
         for dep in deps.split(" "):
                 #print(f"# dep={dep} \\")
                 dirname=os.path.dirname(dep)
