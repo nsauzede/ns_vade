@@ -93,6 +93,8 @@ RUNVLANGTEST:=RUNV
 VLANGTESTFLAGS:=-stats test
 endif
 
+DYN_FLAGS:=-ldl -rdynamic
+
 PYTFLAGS:=-v
 PYTEST:=pytest
 PYT:=$(PYTHON) -m unittest
@@ -338,19 +340,19 @@ vade/target/bin/$(STEM)/lib$(STEM).so: vade/target/pkg/$(STEM)/lib$(STEM).a | va
 vade/target/bin/%_test.exe: $(TESTLIB) | $(TESTLIB)
 #	$(AT)echo "%_test.exe: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
 	$(AT)mkdir -p $(@D)
-#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(CFLAGS)
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
-#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic
+#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(DYN_FLAGS) $(CFLAGS)
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(DYN_FLAGS) $(COVLIBS)
+#	$(call BRIEF,CC) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(DYN_FLAGS)
 
 vade/target/bin/%_test.exe: $(LIB) | $(LIB)
 #	@echo "DOING %.exe for STEM=$(STEM)"
 	$(AT)mkdir -p $(@D)
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(DYN_FLAGS) $(COVLIBS)
 
 vade/target/bin/%.exe: $(LIB) | $(LIB)
 #	@echo "DOING %.exe for STEM=$(STEM)"
 	$(AT)mkdir -p $(@D)
-	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive -ldl -rdynamic $(COVLIBS)
+	$(call BRIEF,CXX) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive $(DYN_FLAGS) $(COVLIBS)
 
 .PHONY:$(VADE_PKGS)
 
