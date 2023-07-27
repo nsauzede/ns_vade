@@ -201,10 +201,10 @@ vade/target/pkg/$(STEM)/%.d:
 #	$(AT)echo "DEPSASMFILES=$(DEPSASMFILES)"
 	$(AT)echo -n > $@
 	$(AT)for f in $(DEPSCFILES); do \
-		$(CC) -MM vade/src/$$f.c $(CFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
+		$(CC) -MM vade/src/$$f.c $(CFLAGS) -DTEST_SYMS='""' | tee -a $(@)_c.deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSCPPFILES); do \
-		$(CXX) -MM vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS='""' | tee $(@).deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
+		$(CXX) -MM vade/src/$$f.cpp $(CXXFLAGS) -DTEST_SYMS='""' | tee -a $(@)_cxx.deps | $(VADEROOT)/bin/deps.py `dirname $$f` >> $@ || exit 1; \
 	done
 	$(AT)for f in $(DEPSASMFILES); do \
 		echo "vade/target/pkg/$$f.bin: vade/src/$$f.asm" >> $@ || exit 1; \
@@ -308,18 +308,19 @@ vade/target/pkg/$(STEM)/%.bin: vade/src/$(STEM)/%.asm
 #	echo "DOING %.bin for STEM=$(STEM)"
 	$(NASM) -o $@ $<
 
-DEPS=$(shell test -f vade/target/pkg/$(STEM)/$(STEM).d && cat vade/target/pkg/$(STEM)/$(STEM).d | $(VADEROOT)/bin/deps.py)
-#DEPS=$(patsubst %.h,%.o,$(patsubst vade/src/%,vade/target/pkg/%,$(shell test -f vade/target/pkg/$(STEM)/$(STEM).d && cat vade/target/pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "test" | grep '.h' | cut -f 3 -d " ")))
-#vade/target/pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
-#vade/target/pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
-vade/target/pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
-#	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
-#	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
-#	$(AT)echo "_DEPS=$(_DEPS)"
-#	$(AT)echo "DEPS=$(DEPS)"
-	$(AT)mkdir -p $(@D)
-	$(RM) -f $@
-	$(call BRIEF,AR) crsT $@ $^
+#DEPS=$(shell test -f vade/target/pkg/$(STEM)/$(STEM).d && cat vade/target/pkg/$(STEM)/$(STEM).d | $(VADEROOT)/bin/deps.py)
+##DEPS=$(patsubst %.h,%.o,$(patsubst vade/src/%,vade/target/pkg/%,$(shell test -f vade/target/pkg/$(STEM)/$(STEM).d && cat vade/target/pkg/$(STEM)/$(STEM).d | grep -v "_test.o" | grep -v "test" | grep '.h' | cut -f 3 -d " ")))
+##vade/target/pkg/$(STEM)/lib%.a: $(LIBOBJS) $(DEPS) | $(LIBOBJS)
+##vade/target/pkg/$(STEM)/lib%.a: $(LIBOBJS) | $(LIBOBJS)
+##vade/target/pkg/$(STEM)/%.a: $(LIBOBJS) | $(LIBOBJS)
+#vade/target/pkg/$(STEM)/BADBAD/%.a: $(LIBOBJS) | $(LIBOBJS)
+##	$(AT)echo "lib%.a: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
+##	$(AT)echo "1LIBOBJS=$(LIBOBJS)"
+##	$(AT)echo "_DEPS=$(_DEPS)"
+##	$(AT)echo "DEPS=$(DEPS)"
+#	$(AT)mkdir -p $(@D)
+#	$(RM) -f $@
+#	$(call BRIEF,AR) crsT $@ $^
 
 vade/target/bin/lib%_test.so: $(TESTOBJS) | $(TESTOBJS)
 #	$(AT)echo "%.so: how to build $@ ? stem=$* STEM=$(STEM) F=$(@F) f=$(patsubst lib%.a,%,$(@F)) D=$(@D) prereq=$^"
@@ -374,13 +375,13 @@ $(VADE_PKGS): vade/target/pkg/vade_dep.d
 #	$(AT)$(MAKE) $(SILENTMAKE) vade/target/pkg/$(@F)/$(@F).d STEM=$(@F) V=$(V)
 #	$(MAKE) $(SILENTMAKE) vade/target/pkg/$(@F).d STEM=$(@F) V=$(V)
 #	$(AT)echo "here1"
-	$(AT)$(VADEMAKEINTERNAL) $(SILENTMAKE) $@/lib$(@F).a STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
+	$(AT)test -s $@/$(@F).d && $(VADEMAKEINTERNAL) $(SILENTMAKE) $@/lib$(@F).a STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here2"
 	$(AT)test -f $@/lib$(@F).a && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/lib$(@F).so STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep T\ main > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here3 doing vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@)"
 #	$(AT)test -z "$(wildcard vade/src/$(patsubst vade/target/pkg/%,%,$@)/*_test.\(c\|cpp\))" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
-	$(AT)test -z "$(shell find vade/src/$(patsubst vade/target/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)')" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
+	$(AT)test -z "$(shell find vade/src/$(patsubst vade/target/pkg/%,%,$@) -regextype posix-extended -regex '.*_test.(c|cpp)' | sort)" || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V)
 #	$(AT)test -z `$(NM) $@/*.o | grep _Test_ > /dev/null` || $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F).exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 	$(AT)test -f $@/lib$(@F).a && $(NM) $@/lib$(@F).a | grep _Test_ > /dev/null && $(VADEMAKEINTERNAL) $(SILENTMAKE) vade/target/bin/$(patsubst vade/target/pkg/%,%,$@)/$(@F)_test.exe STEM=$(patsubst vade/target/pkg/%,%,$@) V=$(V) || true
 #	$(AT)echo "here4"
