@@ -62,7 +62,9 @@ ifeq ($(CC),$(CLANG))
 VALGRIND:=
 endif
 
-ifeq (, $(shell which $(VALGRIND) 2>/dev/null))
+ifneq (,$(VALGRIND))
+# Check if valgrind is operational (eg: not missing debuginfo etc..)
+ifneq (0, $(shell ($(VALGRIND) /bin/true 2>/dev/null ; echo $$?)))
 #$(error "NOT HAVE VALGRIND ($(VALGRIND))")
 RUN:=
 RUNTEST:=RUN
@@ -71,6 +73,8 @@ else
 VGRUN:=$(VALGRIND) $(VGOPTS)
 RUNTEST:=VGRUN
 endif
+endif
+
 RUNPYTEST:=RUNPY
 
 ifeq (, $(shell which $(GCOV) 2>/dev/null))
