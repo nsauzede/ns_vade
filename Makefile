@@ -44,8 +44,8 @@ ifneq ($(findstring vade/src/,$(RPWD)),)
 P0:=$(patsubst vade/src/%,%,$(RPWD))
 ifneq ($(findstring $(P0),$(DIRS)),)
 P:=$(patsubst vade/src/%,%,$(RPWD))
-VALGRIND:=
-GCOV:=
+#VALGRIND:=
+#GCOV:=
 endif
 endif
 
