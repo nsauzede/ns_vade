@@ -21,6 +21,7 @@ VADEROOT:=$(shell dirname $(mkfile_path))
 VADEMAKEINTERNAL:=make -f $(VADEROOT)/internal.mk SILENTMAKE=$(SILENTMAKE) VADEROOT=$(VADEROOT)
 
 # CC0 is gcc, required to build *.so -- TODO fix thin *.a archives for TCC
+CC:=gcc
 CC0:=gcc
 AR:=ar
 NM:=nm
@@ -65,14 +66,17 @@ endif
 ifneq (,$(VALGRIND))
 # Check if valgrind is operational (eg: not missing debuginfo etc..)
 ifneq (0, $(shell ($(VALGRIND) /bin/true 2>/dev/null ; echo $$?)))
+VALGRIND:=
+endif
+endif
+
+ifeq (,$(VALGRIND))
 #$(error "NOT HAVE VALGRIND ($(VALGRIND))")
-RUN:=
 RUNTEST:=RUN
 else
 #$(error "HAVE VALGRIND ($(VALGRIND))")
 VGRUN:=$(VALGRIND) $(VGOPTS)
 RUNTEST:=VGRUN
-endif
 endif
 
 RUNPYTEST:=RUNPY
