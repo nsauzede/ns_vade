@@ -207,5 +207,5 @@ Python unit tests are also supported, with some facilities to test C APIs, se `v
 
 Enjoy !
 
-[WorkflowBadge]: https://github.com/nsauzede/ns_vade/workflows/vade/badge.svg
+[WorkflowBadge]: https://github.com/nsauzede/ns_vade/actions/workflows/vade.yml/badge.svg
 [WorkflowUrl]: https://github.com/nsauzede/ns_vade/commits/main
