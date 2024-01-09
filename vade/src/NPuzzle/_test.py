@@ -125,12 +125,51 @@ def idfs(inp0:list, goal:list)->int:
         depth+=1
     return res
 
+def bfs(inp0:list, goal:list)->int:
+    seen={}
+    step = 0
+    inps=[inp0]
+    #print()
+    while True:
+        outs=[]
+        for inp in inps:
+            #print(f"eval inp={inp}")
+            if inp==goal:
+                #print(f"found goal! step={step}")
+                return step
+            sinp=str(inp)
+            if sinp in seen:
+                continue
+            seen[sinp]=1
+            outs+=gen(inp)
+        #print(f"outs={outs}")
+        if len(outs)==0:
+            break
+        inps=outs
+        step+=1
+    0/0
+
 class T000(unittest.TestCase):
-    def Ztest_bfs_0000(self):
+    def test_bfs_0004(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[1,2,3],[4,5,6],[8,7,0]]
+        res=bfs(init, goal)
+        self.assertEqual(4, res)
+    def test_bfs_0002(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[2,3,0],[1,4,5],[8,7,6]]
+        res=bfs(init, goal)
+        self.assertEqual(2, res)
+    def test_bfs_0001(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[2,0,3],[1,4,5],[8,7,6]]
+        res=bfs(init, goal)
+        self.assertEqual(1, res)
+    def test_bfs_0000(self):
         init=[[0,2,3],[1,4,5],[8,7,6]]
         goal=[[0,2,3],[1,4,5],[8,7,6]]
         res=bfs(init, goal)
-        self.assertEqual(1, res)
+        self.assertEqual(0, res)
     def test_idfs_0000(self):
         init=[[0,2,3],[1,4,5],[8,7,6]]
         goal=[[1,2,3],[4,5,6],[8,7,0]]
