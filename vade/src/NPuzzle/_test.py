@@ -1,4 +1,4 @@
-import unittest
+import math
 from copy import deepcopy
 def gen(inp:list)->list:
     a,b,c,d=[deepcopy(inp)for i in range(4)]
@@ -149,7 +149,35 @@ def bfs(inp0:list, goal:list)->int:
         step+=1
     0/0
 
+def manh(a,b):
+    n=0
+    if a!=b:n+=abs(b-a)
+    return n
+# returns manhattan distance between coords
+def manhattan(coord1:tuple, coord2=(0,0))->int:
+    return manh(coord1[1],coord2[1])+manh(coord1[0],coord2[0])
+
+# returns euclidean distance between coords
+def euclidean(coord1:tuple, coord2=(0,0))->int:
+    a,b=coord1[0]-coord2[0],coord1[1]-coord2[1]
+    return math.sqrt(a*a+b*b)
+
+import unittest
 class T000(unittest.TestCase):
+    def test_eucl_0000(self):
+        self.assertEqual(0, euclidean((1,1),(1,1)))
+        self.assertEqual(1, euclidean((0,0),(1,0)))
+        self.assertEqual(math.sqrt(2), euclidean((0,0),(1,1)))
+        self.assertEqual(math.sqrt(5), euclidean((0,0),(2,1)))
+        self.assertEqual(math.sqrt(8), euclidean((0,0),(2,2)))
+        self.assertEqual(5, euclidean((0,0),(4,3)))
+    def test_manh_0000(self):
+        self.assertEqual(0, manhattan((1,1),(1,1)))
+        self.assertEqual(1, manhattan((0,0),(1,0)))
+        self.assertEqual(2, manhattan((0,0),(1,1)))
+        self.assertEqual(3, manhattan((0,0),(2,1)))
+        self.assertEqual(4, manhattan((0,0),(2,2)))
+        self.assertEqual(7, manhattan((0,0),(4,3)))
     def test_bfs_0004(self):
         init=[[0,2,3],[1,4,5],[8,7,6]]
         goal=[[1,2,3],[4,5,6],[8,7,0]]
