@@ -162,8 +162,90 @@ def euclidean(coord1:tuple, coord2=(0,0))->int:
     a,b=coord1[0]-coord2[0],coord1[1]-coord2[1]
     return math.sqrt(a*a+b*b)
 
+def astar(inp0:list, goal:list)->int:
+    res=0
+    inp=inp0
+    while inp:
+        outs=gen(inp)
+        print(f"outs={outs}")
+        mini=999999999999999999
+        inp=None
+        for out in outs:
+            dist=getdist(out, goal)
+            print(f"dist={dist}")
+            if dist<mini:
+                mini=dist
+                inp=out
+        break
+    return 0
+
+def getdist(a:list,b:list)->int:
+    res=0
+    h=len(a)
+    w=len(a[0])
+    for j in range(h):
+        for i in range(w):
+            e=a[j][i]
+            bpos=getcoords(b,e)
+            d=manhattan((i,j),bpos)
+            #print(f"d={d} e={e} {(i,j)}")
+            res+=d
+    return res//2
+
+def getcoords(l:list,e0:int)->(int,int):
+    for j,r in enumerate(l):
+        for i,e in enumerate(r):
+            if e==e0:return(i,j)
+    return None
+
 import unittest
 class T000(unittest.TestCase):
+    def Ztest_astar_1001(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[2,0,3],[1,4,5],[8,7,6]]
+        res=astar(init, goal)
+        self.assertEqual(1, res)
+    def Ztest_astar_0001_b(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[2,0,3],[1,4,5],[8,7,6]]
+        res=astar(init, goal)
+        self.assertEqual(1, res)
+    def Ztest_astar_0001_a(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[1,2,3],[0,4,5],[8,7,6]]
+        res=astar(init, goal)
+        self.assertEqual(1, res)
+    def test_astar_0000(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[0,2,3],[1,4,5],[8,7,6]]
+        res=astar(init, goal)
+        self.assertEqual(0, res)
+    def test_getdist_0002(self):
+        init=[[2,0,3],[1,4,5],[8,7,6]]
+        goal=[[1,2,3],[0,4,5],[8,7,6]]
+        res=getdist(init, goal)
+        self.assertEqual(2, res)
+    def test_getdist_0001(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[1,2,3],[0,4,5],[8,7,6]]
+        res=getdist(init, goal)
+        self.assertEqual(1, res)
+    def test_getcoords_0000(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        self.assertEqual((0,0), getcoords(init, 0))
+        self.assertEqual((0,1), getcoords(init, 1))
+        self.assertEqual((1,0), getcoords(init, 2))
+        self.assertEqual((2,0), getcoords(init, 3))
+        self.assertEqual((1,1), getcoords(init, 4))
+        self.assertEqual((2,1), getcoords(init, 5))
+        self.assertEqual((2,2), getcoords(init, 6))
+        self.assertEqual((1,2), getcoords(init, 7))
+        self.assertEqual((0,2), getcoords(init, 8))
+    def test_getdist_0000(self):
+        init=[[0,2,3],[1,4,5],[8,7,6]]
+        goal=[[0,2,3],[1,4,5],[8,7,6]]
+        res=getdist(init, goal)
+        self.assertEqual(0, res)
     def test_eucl_0000(self):
         self.assertEqual(0, euclidean((1,1),(1,1)))
         self.assertEqual(1, euclidean((0,0),(1,0)))
