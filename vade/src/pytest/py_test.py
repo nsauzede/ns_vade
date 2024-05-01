@@ -1,4 +1,4 @@
-from vadetest import *
+import unittest
 
 class TestPy(unittest.TestCase):
 
